@@ -33,6 +33,8 @@
                                 :class="{ 'is-invalid': errors.password }" />
                             <div class="invalid-feedback">{{ errors.password }}</div>
                         </div>
+
+
                         <div class="form-footer">
                             <button type="submit" class="btn btn-primary w-100">Iniciar sesión</button>
                         </div>
@@ -57,6 +59,7 @@ import * as Yup from 'yup';
 import { useAccountStore } from '@/stores/account';
 import { onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 
 const storeAccount = useAccountStore();
 
@@ -72,7 +75,6 @@ const validate = Yup.object().shape({
 const email = ref('')
 const password = ref('')
 
-// Limpiar el almacenamiento de la sesión antes de montar
 onBeforeMount(() => {
     sessionStorage.clear();
 })
@@ -83,11 +85,46 @@ async function loguear() {
     // Llama al servicio del store
     const response = await storeAccount.login(email.value, password.value);
 
-    if (response) {
-        // Redirigir al home si es exitoso
+    if (response.statusCode === 200) {
         router.push('/home');
+
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'bottom-end',
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        Toast.fire({
+            icon: 'success',
+            title: response.message
+        })
+
     } else {
-        console.error("Error al iniciar sesión.");
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'bottom-end',
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        Toast.fire({
+            icon: 'error',
+            title: response.message
+        })
+
     }
 
 
