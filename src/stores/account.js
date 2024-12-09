@@ -7,6 +7,7 @@ import jwt_decode from 'jwt-decode';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const token = sessionStorage.getItem('token');
 
+
 export const useAccountStore = defineStore('account', {
     state: () => ({
         isAuthenticated: !!token,
