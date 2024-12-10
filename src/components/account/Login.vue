@@ -23,9 +23,10 @@
                         </div>
                         <div class="mb-2">
                             <label class="form-label">
-                                Contraseña
+                                Contraseña:
                                 <span class="form-label-description">
-                                    <a href="./forgot-password.html">Olvidé la contraseña</a>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#modal-scrollable">Olvidé la
+                                        contraseña</a>
                                 </span>
                             </label>
                             <Field v-model="password" name="password" placeholder="Contraseña" id="floating-input-u"
@@ -33,11 +34,39 @@
                                 :class="{ 'is-invalid': errors.password }" />
                             <div class="invalid-feedback">{{ errors.password }}</div>
                         </div>
+                        <!-- <div class="mb-2">
+                            <a href="#" class="form-label">
+                                Desbloquear cuenta
+                            </a>
+                        </div> -->
 
+                        <div v-if="storeAccount.messageVisible" class="alert alert-danger" role="alert">
+                            <div class="d-flex">
+                                <div>
+                                    <!-- Download SVG icon from http://tabler-icons.io/i/alert-circle -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="icon alert-icon">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+                                        <path d="M12 8v4"></path>
+                                        <path d="M12 16h.01"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    {{ storeAccount.message }}
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="form-footer">
                             <button type="submit" class="btn btn-primary w-100">Iniciar sesión</button>
                         </div>
+
+                        <div class="text-center text-muted mt-3">
+                            ¿Bloqueo de cuenta? <a href="#" tabindex="-1">desbloquear cuenta</a>
+                        </div>
+
                     </Form>
                 </div>
             </div>
@@ -48,9 +77,13 @@
         </div>
 
     </main>
+
+    <RestorePassword />
 </template>
 
 <script setup>
+import RestorePassword from '@/components/modals/RestorePassword.vue'
+
 import logo from '@/assets/img/fondo.png';
 
 import { Form, Field } from 'vee-validate';
@@ -82,51 +115,48 @@ onBeforeMount(() => {
 const router = useRouter();
 
 async function loguear() {
-    // Llama al servicio del store
     const response = await storeAccount.login(email.value, password.value);
 
     if (response.statusCode === 200) {
         router.push('/home');
 
+        // const Toast = Swal.mixin({
+        //     toast: true,
+        //     position: 'bottom-end',
+        //     showConfirmButton: false,
+        //     timer: 5000,
+        //     timerProgressBar: true,
+        //     didOpen: (toast) => {
+        //         toast.addEventListener('mouseenter', Swal.stopTimer)
+        //         toast.addEventListener('mouseleave', Swal.resumeTimer)
+        //     }
+        // });
 
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'bottom-end',
-            showConfirmButton: false,
-            timer: 5000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        });
-
-        Toast.fire({
-            icon: 'success',
-            title: response.message
-        })
+        // Toast.fire({
+        //     icon: 'success',
+        //     title: response.message
+        // })
 
     } else {
 
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'bottom-end',
-            showConfirmButton: false,
-            timer: 5000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        });
+        // const Toast = Swal.mixin({
+        //     toast: true,
+        //     position: 'bottom-end',
+        //     showConfirmButton: false,
+        //     timer: 5000,
+        //     timerProgressBar: true,
+        //     didOpen: (toast) => {
+        //         toast.addEventListener('mouseenter', Swal.stopTimer)
+        //         toast.addEventListener('mouseleave', Swal.resumeTimer)
+        //     }
+        // });
 
-        Toast.fire({
-            icon: 'error',
-            title: response.message
-        })
+        // Toast.fire({
+        //     icon: 'error',
+        //     title: response.message
+        // })
 
     }
-
 
 }
 

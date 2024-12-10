@@ -7,6 +7,9 @@ const email = sessionStorage.getItem('email');
 const first_name = sessionStorage.getItem('first_name');
 const last_name = sessionStorage.getItem('last_name');
 
+
+
+
 </script>
 
 <template>
@@ -62,41 +65,32 @@ const last_name = sessionStorage.getItem('last_name');
                                 <h3 class="card-title mt-4">Perfil comercial</h3>
                                 <div class="row g-3">
                                     <div class="col-md">
-                                        <div class="form-label">Nombre</div>
+                                        <div class="form-label">Nombre:</div>
                                         <input type="text" class="form-control" :value="first_name">
                                     </div>
                                     <div class="col-md">
-                                        <div class="form-label">Apellido</div>
+                                        <div class="form-label">Apellido:</div>
                                         <input type="text" class="form-control" :value="last_name">
                                     </div>
                                     <div class="col-md">
-                                        <div class="form-label">Ubicación</div>
+                                        <div class="form-label">Ubicación:</div>
                                         <input type="text" class="form-control" value="Miranda, Venezuela">
                                     </div>
                                 </div>
 
                                 <h3 class="card-title mt-4">Datos sesión</h3>
                                 <div class="row g-3">
-                                    <div class="col">
-                                        <div class="form-label">Correo</div>
-                                        <div class="row g-2">
-                                            <div class="col">
-                                                <input type="text" class="form-control" :value="email">
-                                            </div>
-                                            <div class="col">
-                                                <a href="#" class="btn">
-                                                    Cambiar
-                                                </a>
-                                            </div>
-                                        </div>
+                                    <div class="col-md-6">
+                                        <div class="form-label">Correo:</div>
+                                        <input type="text" class="form-control" :value="email">
                                     </div>
 
-                                    <div class="col">
-                                        <div class="form-label">Contraseña</div>
-                                        <a href="#" class="btn">
-                                            Establecer nueva contraseña
-                                        </a>
+                                    <div class="col-md-6">
+                                        <div class="form-label">Contraseña:</div>
+                                        <a href="#" class="btn w-100">Establecer nueva contraseña</a>
                                     </div>
+
+                                    
                                 </div>
                             </div>
                             <div class="card-footer bg-transparent mt-auto">

@@ -9,13 +9,21 @@ const token = sessionStorage.getItem('token');
 export const useAccountStore = defineStore('account', {
     state: () => ({
         isAuthenticated: !!token,
+
+        message: null,
+        messageVisible: false,
+        messageVisibleModal: false,
+        messageErrorModal: false,
+        timeoutId: null,
+        isCooldown: false, // Estado para controlar el tiempo de espera
+        cooldownTime: 60, // 60 segundos
+        intervalId: null, // ID para el setInterval
     }),
     actions: {
         async login(email, password) {
             try {
                 const response = await axios.post(`${BASE_URL}api/v1/auth/login`, { 'email': email, 'password': password });
 
-                
                 if (response.data.statusCode === 200) {
 
                     sessionStorage.setItem("token", response.data.data.token); // Guardamos el token
@@ -31,12 +39,26 @@ export const useAccountStore = defineStore('account', {
                     return response.data;
                 }
 
-                
-
             } catch (error) {
+
                 console.log("Error al loguearse");
                 if (error.response.data.statusCode) {
-                    return error.response.data
+                    this.message = error.response.data.message;
+                    this.messageVisible = true;
+
+                    // Reinicia el temporizador si existe
+                    if (this.timeoutId) {
+                        clearTimeout(this.timeoutId);
+                    }
+
+                    // Configura un nuevo temporizador
+                    this.timeoutId = setTimeout(() => {
+                        this.messageVisible = false;
+                    }, 5000);
+
+                    return error.response.data;
+
+
                 }
             }
         },
@@ -68,6 +90,71 @@ export const useAccountStore = defineStore('account', {
             this.isAuthenticated = false;
             router.push('/')
         },
+
+        async sendCode(email, ci, birthdate) {
+            if (this.isCooldown) {
+                this.message = 'Debe esperar 1 minuto antes de enviar otro código.';
+                this.messageVisibleModal = true;
+                return;
+            }
+
+            try {
+                const response = await axios.put(`${BASE_URL}api/v1/auth/account/code`, { email, ci, birthdate });
+
+                if (response.data.statusCode === 200) {
+                    // Activar el enfriamiento (espera de 60 segundos)
+                    this.isCooldown = true;
+                    this.cooldownTime = 60; // Resetear los segundos de espera
+                    this.message = `Código enviado exitosamente, ${this.cooldownTime} segundos para regenerar.`;
+                    this.messageVisibleModal = true;
+
+                    // Iniciar un temporizador para actualizar los segundos restantes en tiempo real
+                    this.intervalId = setInterval(() => {
+                        if (this.cooldownTime > 0) {
+                            this.cooldownTime--;
+                            this.message = `Código enviado exitosamente, ${this.cooldownTime} segundos para regenerar.`;
+                        }
+                    }, 1000); // Actualiza cada segundo
+
+                    // Iniciar un temporizador para restablecer el estado de cooldown después de 60 segundos
+                    setTimeout(() => {
+                        this.isCooldown = false;
+                        clearInterval(this.intervalId); // Detener el intervalo
+                        this.messageVisibleModal = false;
+                    }, 60000); // 1 minuto (60,000 ms)
+
+                    return response.data;
+                }
+            } catch (error) {
+                this.message = 'No se pudo enviar el código a su correo, por favor verifique su conexión';
+                this.messageErrorModal = true;
+
+                // Reinicia el temporizador si existe
+                if (this.timeoutId) {
+                    clearTimeout(this.timeoutId);
+                }
+
+                // Configura un nuevo temporizador
+                this.timeoutId = setTimeout(() => {
+                    this.messageErrorModal = false;
+                }, 5000);
+
+                return error.response.data
+            }
+        },
+
+        async restorePassword(email, ci, birthdate, recovery_code) {
+            try {
+                const response = await axios.put(`${BASE_URL}api/v1/auth/account/restore-password`, { email, ci, birthdate, recovery_code });
+
+                if (response.data.statusCode === 200) {
+                    return response.data
+                }
+            } catch (error) {
+                return error.response.data
+            }
+        }
+
     },
     getters: {
         getIsAuthenticated: (state) => state.isAuthenticated,
@@ -85,7 +172,6 @@ axios.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-
 // Manejo de respuestas con error 401 (token expirado o no válido)
 axios.interceptors.response.use(
     (response) => response,
@@ -93,7 +179,7 @@ axios.interceptors.response.use(
         // Si la respuesta tiene un error 401, deslogueamos al usuario
         if (error.response && error.response.status === 401) {
             sessionStorage.clear();
-            
+
         }
         return Promise.reject(error);
     }
