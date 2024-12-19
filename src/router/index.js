@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/account/Login.vue'
 import HomeView from '../views/HomeView.vue'
 import CustomersView from '../views/CustomersView.vue'
+import Form from '../components/form/Form.vue'
 import ProfileView from '../views/ProfileView.vue'
 import { useAccountStore } from '../stores/account'; // Asegúrate de importar el store correctamente
 
@@ -51,9 +52,9 @@ const router = createRouter({
       }
     },
     {
-      path: '/categorias',
-      name: 'categorias',
-      component: CustomersView
+      path: '/form',
+      name: 'form',
+      component: Form
     },
     {
       path: '/correos',
