@@ -13,17 +13,13 @@ const isAuthenticated = computed(() => accountStore.getIsAuthenticated); // Comp
 
 // Verificar el token al cargar
 onMounted(async () => {
-    
     if (isAuthenticated.value) {
         const validToken = await accountStore.verifyToken();
-
         if (!validToken) {
             // Redirigir al login sin recargar la página
             router.push('/');  // Usa router.push en lugar de window.location.href
         }
     }
-
-
 });
 
 </script>

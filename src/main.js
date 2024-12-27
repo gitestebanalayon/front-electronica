@@ -1,3 +1,4 @@
+import './assets/css/styles.css';
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
@@ -5,6 +6,7 @@ import router from './router'
 import VueSweetalert2 from 'vue-sweetalert2';
 import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net';
+
 
 
 import 'vue-step-progress/dist/main.css';

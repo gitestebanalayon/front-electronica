@@ -25,7 +25,7 @@
                             <label class="form-label">
                                 Contraseña:
                                 <span class="form-label-description">
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#modal-scrollable">Olvidé la
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#modal-simple">Olvidé la
                                         contraseña</a>
                                 </span>
                             </label>
@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-import RestorePassword from '@/components/modals/RestorePassword.vue'
+import RestorePassword from '@/components/modals/forms/RestorePassword.vue'
 
 import logo from '@/assets/img/fondo.png';
 

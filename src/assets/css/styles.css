@@ -1,0 +1,86 @@
+@import "@icon/themify-icons/themify-icons.css";
+
+/*IMPORTANTE PARA LOS ICONOS*/
+.card {
+    border: none !important;
+}
+
+input {
+    outline: none;
+}
+
+i {
+    font-size: 16px;
+}
+
+.alert {
+    margin: 0 !important;
+}
+
+.input-group{
+    box-shadow: none !important;
+}
+
+
+/* STEP PROGRESS */
+#restore-password .progresss {
+    width: 170px !important;
+}
+
+#restore-password .step-progress__bar {
+    margin: 20px 0 0 0 !important;
+    height: 50px !important;
+}
+
+#restore-password .step-progress__step {
+    transform: scale(0.5) !important;
+}
+
+body #restore-password .step-progress__step::after,
+body #restore-password .step-progress__wrapper-before {
+    background: rgb(237, 237, 237) !important;
+}
+
+body #restore-password .step-progress__step--active::after,
+body #restore-password .step-progress__step--valid::after {
+    background: rgb(47, 179, 68) !important;
+}
+
+
+[data-bs-theme="dark"] #restore-password .step-progress__step::after,
+[data-bs-theme="dark"] #restore-password .step-progress__wrapper-before {
+    background: rgb(21, 31, 44) !important;
+}
+
+[data-bs-theme="dark"] #restore-password .step-progress__step--active::after,
+[data-bs-theme="dark"] #restore-password .step-progress__step--valid::after {
+    background: rgb(47, 179, 68) !important;
+}
+
+
+#restore-password .step-progress__step-label {
+    font-size: 1.7em !important;
+    font-weight: 700 !important;
+    color: rgb(186, 186, 186) !important;
+}
+
+[data-bs-theme="dark"] #restore-password .step-progress__step-label {
+    color: rgb(255, 255, 255) !important;
+}
+
+
+[data-bs-theme="dark"] #restore-password .step-progress__step--active .step-progress__step-label {
+    color: rgb(10, 116, 222) !important;
+}
+
+#restore-password .step-progress__step--active .step-progress__step-label {
+    color: rgb(0, 84, 166) !important;
+}
+
+#restore-password .step-progress__step--valid .step-progress__step-label {
+    color: rgb(43, 162, 63) !important;
+}
+
+[data-bs-theme="dark"] #restore-password .step-progress__step--valid .step-progress__step-label {
+    color: rgb(62, 225, 89) !important;
+}

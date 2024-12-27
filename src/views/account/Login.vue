@@ -44,8 +44,4 @@ onMounted(async () => {
     }
 
 });
-
-
-
-
 </script>
