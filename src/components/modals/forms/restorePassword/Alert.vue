@@ -11,7 +11,7 @@ defineProps(['type', 'title', 'text', 'icon']);
     <div :class="`alert alert-${type}`" role="alert">
         <div class="d-flex">
             <div>
-                <div v-if="icon === 'check'" v-html="svg.check"></div>
+                <div v-if="icon === 'success'" v-html="svg.success"></div>
                 <div v-if="icon === 'info'" v-html="svg.info"></div>
                 <div v-if="icon === 'warning'" v-html="svg.warning"></div>
                 <div v-if="icon === 'danger'" v-html="svg.danger"></div>

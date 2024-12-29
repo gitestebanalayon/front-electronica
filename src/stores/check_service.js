@@ -19,7 +19,6 @@ export const useCheckServiceStore = defineStore('check_service', {
                     return false;
                 }
             } catch (error) {
-                console.error("Error al verificar el servicio:", error);
                 return false;
             }
         }

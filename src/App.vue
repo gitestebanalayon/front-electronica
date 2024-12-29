@@ -9,11 +9,11 @@ import NavBarTop from './components/navbartop/Component.vue';
 
 const router = useRouter(); // Obtén el enrutador
 const accountStore = useAccountStore(); // Obtén el store de Pinia
-const isAuthenticated = computed(() => accountStore.getIsAuthenticated); // Computed para el estado de autenticación
+
 
 // Verificar el token al cargar
 onMounted(async () => {
-    if (isAuthenticated.value) {
+    if (accountStore.isAuthenticated) {
         const validToken = await accountStore.verifyToken();
         if (!validToken) {
             // Redirigir al login sin recargar la página
@@ -25,7 +25,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <NavBar v-if="isAuthenticated" />
-    <NavBarTop v-if="isAuthenticated" />
+    <NavBar v-if="accountStore.isAuthenticated" />
+    <NavBarTop v-if="accountStore.isAuthenticated" />
     <RouterView />
 </template>
