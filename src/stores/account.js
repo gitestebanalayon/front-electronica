@@ -5,12 +5,19 @@ import jwt_decode from 'jwt-decode';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+
+
+
 const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+
+
 
 
 export const useAccountStore = defineStore('account', {
     state: () => ({
         isAuthenticated: !!user.token, // Indica si el usuario está autenticado
+        user: {}, // Almacena los datos del usuario
+
         alerts: [], // Lista de alertas activas
         apiName: null, // Nombre de la API que se está llamando
 
@@ -64,16 +71,19 @@ export const useAccountStore = defineStore('account', {
                     const token = response.data.data.token;
                     const decodedToken = jwt_decode(token);
 
-                    // Guardamos todos los datos en un solo item
-                    sessionStorage.setItem("user", JSON.stringify({
+                    // Guardamos los datos en sessionStorage
+                    const userData = {
                         token,
                         id: decodedToken.id,
                         email: decodedToken.email,
                         first_name: decodedToken.first_name,
                         last_name: decodedToken.last_name,
-                    }));
+                    };
+                    sessionStorage.setItem("user", JSON.stringify(userData));
 
+                    // Actualizamos el estado en Pinia
                     this.isAuthenticated = true;
+                    this.user = userData;
 
                     return response.data;
                 }
@@ -106,6 +116,8 @@ export const useAccountStore = defineStore('account', {
         },
         async verifyToken() {
             try {
+                const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+
                 const response = await axios.get(`${BASE_URL}api/v1/auth/account/validate-token`, {
                     headers: { Authorization: `Bearer ${user.token}` },
                 });
@@ -338,7 +350,11 @@ export const useAccountStore = defineStore('account', {
                 this.clearAlerts(); // Limpia cualquier alerta existente
 
                 // let headers = { Authorization: token ? `Bearer ${token}` : '', };
-                const response = await axios.get(`${BASE_URL}api/v1/account/filter/profile`, { Authorization: `Bearer ${user.token}` });
+
+                const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+
+                const headers = { Authorization: `Bearer ${user.token}` };
+                const response = await axios.get(`${BASE_URL}api/v1/account/filter/profile`, { headers });
 
                 if (response.data.statusCode === 200) {
                     this.profile = response.data.data

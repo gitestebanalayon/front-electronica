@@ -3,18 +3,13 @@ import Footer from '@/components/footer/Component.vue';
 import Header from '@/components/header/Component.vue';
 import avatar from '@/assets/img/esteban.jpg';
 import { useAccountStore } from '@/stores/account';
+import { onMounted } from 'vue';
 
 const useAccount = useAccountStore();
 
-useAccount.filterProfile();
-
-const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-const email = sessionStorage.getItem('email');
-const first_name = sessionStorage.getItem('first_name');
-const last_name = sessionStorage.getItem('last_name');
-
-
-
+onMounted(async () => {
+    await useAccount.filterProfile();
+})
 
 </script>
 
