@@ -10,105 +10,33 @@ const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
 export const useAccountStore = defineStore('account', {
     state: () => ({
-        isAuthenticated: !!user.token,
+        isAuthenticated: !!user.token, // Indica si el usuario está autenticado
+        alerts: [], // Lista de alertas activas
+        apiName: null, // Nombre de la API que se está llamando
 
-        response_state: {
-            loading: false,
-            apiName: null,
-            status: 0,
-            message: null,
-            timestamp: null,
-        },
-
-        isCooldown: false,
-
-        timeoutId: null,
         cooldownTime: 3,
         intervalId: null,
         isButtonDisabled: false,
 
-
-        alerts: [], // Lista de alertas activas
-        apiName: null,
+        profile: {}
     }),
     actions: {
-        addAlert({ type, title, message, scope = 'global', duration = 5000 }) {
+        // Funciones para manejar las alertas
+        async addAlert({ type, title, message, scope = 'global', duration = 5000 }) {
             const id = Date.now();
             this.alerts.push({ id, type, title, message, scope });
 
             // Elimina la alerta después del tiempo especificado
             setTimeout(() => this.removeAlert(id), duration);
         },
-        removeAlert(id) {
+        async removeAlert(id) {
             this.alerts = this.alerts.filter(alert => alert.id !== id);
         },
-        clearAlerts() {
+        async clearAlerts() {
             this.alerts = [];
         },
 
-
-        // Funciones para manejar las alertas y el tiempo
-        async alertMessage(status, timestamp, message, second) {
-
-            console.log(status);
-
-            // Mostrar mensaje de verificado
-            this.response_state.message = message;
-            this.response_state.timestamp = timestamp;
-
-            // Reiniciar el temporizador si ya existe
-            if (this.cooldownTimer) {
-                clearTimeout(this.cooldownTimer);
-            }
-
-            // Activar el enfriamiento (cooldown)
-            this.isCooldown = true;
-
-            // Establecer un nuevo temporizador de 5 segundos
-            this.cooldownTimer = setTimeout(() => {
-                this.isCooldown = false;
-                this.cooldownTimer = null; // Limpia la referencia
-                this.response_state.message = null;
-                this.response_state.status = 0;
-                this.response_state.apiName = null;
-            }, second); // 5 segundos
-
-            if (status === 200) {
-                this.response_state.status = status;
-                return true;
-            }
-
-            if (status === 401) {
-                this.response_state.status = status;
-                return false;
-            }
-
-            // Si el código de estado es 403, significa que no tiene permiso para acceder al recurso
-            if (status === 403) {
-                this.response_state.status = status;
-                return false;
-            }
-
-            // Si el código de estado es 404, significa que no se encontró el recurso
-            if (status === 404) {
-                this.response_state.status = status;
-                return false;
-            }
-
-            // Si el código de estado es 409, significa que la cuenta no esta bloqueada
-            if (status === 409) {
-                this.response_state.status = status;
-                return false;
-            }
-
-            // Si el código de estado es 422, significa que el código es incorrecto
-            if (status === 422) {
-                this.response_state.status = status;
-                return false;
-            }
-
-        },
-
+        // Función para manejar el temporizador del enviar código
         async startCooldown() {
             this.cooldownTime = 3; // Reinicia el temporizador
             this.intervalId = setInterval(() => {
@@ -139,6 +67,7 @@ export const useAccountStore = defineStore('account', {
                     // Guardamos todos los datos en un solo item
                     sessionStorage.setItem("user", JSON.stringify({
                         token,
+                        id: decodedToken.id,
                         email: decodedToken.email,
                         first_name: decodedToken.first_name,
                         last_name: decodedToken.last_name,
@@ -175,7 +104,6 @@ export const useAccountStore = defineStore('account', {
                 this.apiName = null;
             }
         },
-
         async verifyToken() {
             try {
                 const response = await axios.get(`${BASE_URL}api/v1/auth/account/validate-token`, {
@@ -197,13 +125,11 @@ export const useAccountStore = defineStore('account', {
                 return false;
             }
         },
-
         async logout(router) {
             sessionStorage.clear();
             this.isAuthenticated = false;
             router.push('/')
         },
-
         async verifyAccount(email, ci, birthdate) {
             try {
                 this.apiName = 'verifyAccount';
@@ -256,7 +182,6 @@ export const useAccountStore = defineStore('account', {
             }
 
         },
-
         async sendCode(email, ci, birthdate) {
             try {
                 this.apiName = 'sendCode';
@@ -302,7 +227,6 @@ export const useAccountStore = defineStore('account', {
                 this.apiName = null;
             }
         },
-
         async restorePassword(email, ci, birthdate, recovery_code) {
             try {
                 this.apiName = 'restorePassword';
@@ -355,7 +279,6 @@ export const useAccountStore = defineStore('account', {
                 this.apiName = null;
             }
         },
-
         async unlockAccount(email, ci, birthdate) {
             try {
                 this.apiName = 'unlockAccount';
@@ -409,6 +332,29 @@ export const useAccountStore = defineStore('account', {
                 this.apiName = null;
             }
         },
+        async filterProfile() {
+            try {
+                this.apiName = 'filterProfile';
+                this.clearAlerts(); // Limpia cualquier alerta existente
+
+                // let headers = { Authorization: token ? `Bearer ${token}` : '', };
+                const response = await axios.get(`${BASE_URL}api/v1/account/filter/profile`, { Authorization: `Bearer ${user.token}` });
+
+                if (response.data.statusCode === 200) {
+                    this.profile = response.data.data
+                }
+
+            } catch (error) {
+                this.apiName = null;
+
+                console.log(error.response.data);
+
+
+            } finally {
+                this.apiName = null;
+            }
+        }
+
     },
 });
 

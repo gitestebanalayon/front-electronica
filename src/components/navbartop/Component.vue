@@ -15,9 +15,7 @@ async function exit() {
     await storeAccount.logout(router)
 }
 
-const email = sessionStorage.getItem('email');
-const first_name = sessionStorage.getItem('first_name');
-const last_name = sessionStorage.getItem('last_name');
+const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
 </script>
 
@@ -42,12 +40,12 @@ const last_name = sessionStorage.getItem('last_name');
                             <span class="avatar avatar-sm rounded-circle"
                                 :style="{ backgroundImage: `url(${avatar})` }"></span>
                             <div class="d-none d-xl-block ps-2">
-                                <div>{{ first_name }} {{ last_name }}</div>
-                                <div class="mt-1 small text-muted">{{ email }}</div>
+                                <div>{{ user.first_name }} {{ user.last_name }}</div>
+                                <div class="mt-1 small text-muted">{{ user.email }}</div>
                             </div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                            
+
 
                             <RouterLink to="/profile" class="dropdown-item">Configuración</RouterLink>
                             <div class="dropdown-divider"></div>

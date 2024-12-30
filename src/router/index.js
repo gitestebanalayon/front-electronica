@@ -35,6 +35,14 @@ const router = createRouter({
       }
     },
     {
+      path: '/categorias',
+      name: 'categorias',
+      component: CustomersView,
+      meta: {
+        requiredAuth: true
+      }
+    },
+    {
       path: '/profile',
       name: 'profile',
       component: ProfileView,
