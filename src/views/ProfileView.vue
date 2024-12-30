@@ -1,6 +1,6 @@
 <script setup>
-import Footer from '@/components/footer/Component.vue';
-import Header from '@/components/header/Component.vue';
+import HeaderPage from '@/components/page/header/Component.vue';
+import FooterPage from '@/components/page/footer/Component.vue';
 import avatar from '@/assets/img/esteban.jpg';
 import { useAccountStore } from '@/stores/account';
 import { onMounted } from 'vue';
@@ -16,7 +16,7 @@ onMounted(async () => {
 <template>
     <main class="page-wrapper">
         <!-- Page header -->
-        <Header icon="ti ti-settings" text="Configuración" />
+        <HeaderPage icon="ti ti-settings" text="Configuración" />
 
         <div class="page-body mt-3 mb-3">
             <div class="ps-3 pe-3">
@@ -126,7 +126,7 @@ onMounted(async () => {
         </div>
 
         <!-- Page footer -->
-        <Footer />
+        <FooterPage />
     </main>
 
 </template>

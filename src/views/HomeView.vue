@@ -1,6 +1,6 @@
 <script setup>
-import Header from '@/components/header/Component.vue'
-import Footer from '@/components/footer/Component.vue'
+import HeaderPage from '@/components/page/header/Component.vue'
+import FooterPage from '@/components/page/footer/Component.vue'
 
 import svg from '../assets/svg/icons-svg.json';
 
@@ -12,7 +12,7 @@ import svg from '../assets/svg/icons-svg.json';
 
 
         <!-- Page header -->
-        <Header icon="ti ti-home" text="Inicio" />
+        <HeaderPage icon="ti ti-home" text="Inicio" />
 
         <!-- Page body -->
         <div class="page-body mt-3 mb-3">
@@ -46,8 +46,7 @@ import svg from '../assets/svg/icons-svg.json';
                                     <div class="card-body">
                                         <div class="row align-items-center">
                                             <div class="col-auto">
-                                                <span
-                                                    class="bg-green text-white avatar">
+                                                <span class="bg-green text-white avatar">
                                                     <div v-html="svg.appliances"></div>
                                                 </span>
                                             </div>
@@ -115,7 +114,7 @@ import svg from '../assets/svg/icons-svg.json';
         </div>
 
         <!-- Page footer -->
-        <Footer />
+        <FooterPage />
     </main>
 
 </template>

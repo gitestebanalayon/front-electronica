@@ -1,48 +1,53 @@
 <script setup>
-import FormHeader from "./restorePassword/Header.vue";
-import Button from "./restorePassword/Button.vue";
-import Label from "./restorePassword/Label.vue";
-
-import AlertGlobal from "../../global/AlertGlobal.vue";
-import LoadingGlobal from "../../global/LoadingGlobal.vue";
-import svg from '../../../assets/svg/icons-svg.json';
-
+/*--------------------------------------------------------*/
+// Librerias
 import { ref } from 'vue';
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
 import StepProgress from 'vue-step-progress';
 
+// Componentes
+import HeaderModal from "../component_base/HeaderModal.vue";
+import AlertGlobal from "../../global/AlertGlobal.vue";
+import LabelGlobal from "../../global/LabelGlobal.vue";
+import ButtonGlobal from "../../global/ButtonGlobal.vue";
+
+// SVG para los iconos
+import svg from '../../../assets/svg/icons-svg.json';
+
+// Stores de pinia
 import { useAccountStore } from "@/stores/account";
 const useAccount = useAccountStore();
 
-const schema = ref(
-    yup.object().shape({
-        email: yup
-            .string()
-            .email('Debe ser un correo válido')
-            .required('El correo es obligatorio'),
-        ci: yup
-            .number()
-            .typeError('La cédula debe ser tipo numérico')
-            .required('La cédula es obligatoria')
-            .test(
-                'len',
-                'La cédula debe tener entre 6 y 8 dígitos',
-                value => String(value).length >= 6 && String(value).length <= 8
-            ),
-        birthdate: yup
-            .string()
-            .required('La fecha de nacimiento es obligatoria'),
-        recovery_code: yup
-            .string()
-            .required('El código de recuperación es obligatorio'),
-    })
+/*--------------------------------------------------------*/
+
+const schema = ref(yup.object().shape({
+    email: yup
+        .string()
+        .email('Debe ser un correo válido')
+        .required('El correo es obligatorio'),
+    ci: yup
+        .number()
+        .typeError('La cédula debe ser tipo numérico')
+        .required('La cédula es obligatoria')
+        .test(
+            'len',
+            'La cédula debe tener entre 6 y 8 dígitos',
+            value => String(value).length >= 6 && String(value).length <= 8
+        ),
+    birthdate: yup
+        .string()
+        .required('La fecha de nacimiento es obligatoria'),
+    recovery_code: yup
+        .string()
+        .required('El código de recuperación es obligatorio'),
+})
 );
 
 const formData = ref({
-    ci: '27498161',
-    email: 'estebanalayon7@gmail.com',
-    birthdate: '2000-08-25',
+    ci: '',
+    email: '',
+    birthdate: '',
     recovery_code: '',
 });
 
@@ -97,14 +102,18 @@ async function ready() {
     useAccount.message = null;
 }
 
+/*--------------------------------------------------------*/
+
 </script>
 
 <template>
     <div class="modal modal-blur fade" id="modal-simple" tabindex="-1" style="display: none;" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
+
+            <!--------------------------------------------- Formulario --------------------------------------------->
             <Form id="restore-password" class="modal-content" @submit="restorePassword" :validation-schema="schema"
                 v-slot="{ errors }">
-                <FormHeader title="Restaurar contraseña" />
+                <HeaderModal title="Restaurar contraseña" />
                 <div class="progresss m-auto">
                     <StepProgress v-if="currentStep === 0 || currentStep === 1" :steps="steps"
                         :current-step="currentStep" icon-class="ti ti-check" :active-thickness="0"
@@ -114,7 +123,7 @@ async function ready() {
                 <div v-if="currentStep === 0" class="modal-body d-flex flex-column">
                     <!-- Campo de Cédula -->
                     <div class="mb-3">
-                        <Label label="Cédula" />
+                        <LabelGlobal label="Cédula" />
                         <Field v-model="formData.ci" class="form-control" :class="{ 'is-invalid': errors.ci }"
                             type="number" name="ci" placeholder="Cédula de identidad" />
                         <ErrorMessage name="ci" class="invalid-feedback" />
@@ -122,7 +131,7 @@ async function ready() {
 
                     <!-- Campo de Correo -->
                     <div class="mb-3">
-                        <Label label="Correo" />
+                        <LabelGlobal label="Correo" />
                         <Field v-model="formData.email" class="form-control" :class="{ 'is-invalid': errors.email }"
                             type="email" name="email" placeholder="tucorreo@gmail.com" />
                         <ErrorMessage name="email" class="invalid-feedback" />
@@ -130,7 +139,7 @@ async function ready() {
 
                     <!-- Campo de Fecha de nacimiento -->
                     <div class="mb-3">
-                        <Label label="Fecha de nacimiento" />
+                        <LabelGlobal label="Fecha de nacimiento" />
                         <Field v-model="formData.birthdate" class="form-control"
                             :class="{ 'is-invalid': errors.birthdate }" type="date" name="birthdate" />
                         <ErrorMessage name="birthdate" class="invalid-feedback" />
@@ -143,19 +152,16 @@ async function ready() {
                 <div v-if="currentStep === 1" class="modal-body d-flex flex-column">
                     <!-- Campo de código -->
                     <div class="mb-3">
-                        <Label label="Código" />
+                        <LabelGlobal label="Código" />
                         <div class="input-group mb-2">
                             <Field v-model="formData.recovery_code" class="form-control"
                                 :class="{ 'is-invalid': errors.recovery_code }" type="text" name="recovery_code"
                                 :placeholder="useAccount.intervalId ? 'Coloca el código enviado por correo' : 'Seleccione: Enviar código'" />
 
-
-                            <button class="btn" type="button" :disabled="useAccount.isButtonDisabled"
-                                @click="sendCode(email, ci, birthdate)">
-                                <LoadingGlobal v-if="useAccount.apiName === 'sendCode'" />
-                                <span v-else>{{ useAccount.isButtonDisabled ? useAccount.cooldownTime : "Enviar código"
-                                    }}</span>
-                            </button>
+                            <ButtonGlobal class="btn" type="button" :disabled="useAccount.isButtonDisabled"
+                                @click="sendCode(email, ci, birthdate)"
+                                :label="useAccount.isButtonDisabled ? useAccount.cooldownTime : 'Enviar código'"
+                                :loading="useAccount.apiName === 'sendCode'" />
 
                             <ErrorMessage name="recovery_code" class="invalid-feedback" />
                         </div>
@@ -183,27 +189,20 @@ async function ready() {
                 </div>
 
                 <div class="modal-footer d-flex justify-content-between">
-                    <Button v-if="currentStep === 0" type="button" label="Cancelar" class="btn"
-                        data-bs-dismiss="modal"></Button>
-                    <!-- Button Loader -->
-                    <button v-if="currentStep === 0" @click="verifyAccount()" class="btn btn-primary" type="submit"
-                        :disabled="useAccount.apiName === 'verifyAccount'">
-                        <LoadingGlobal v-if="useAccount.apiName === 'verifyAccount'" />
-                        <span v-else>Verificar</span>
-                    </button>
+                    <ButtonGlobal v-if="currentStep === 0" type="button" label="Cancelar" class="btn"
+                        data-bs-dismiss="modal" />
+                    <ButtonGlobal v-if="currentStep === 0" @click="verifyAccount()" class="btn btn-primary"
+                        type="submit" :disabled="useAccount.apiName === 'verifyAccount'" label="Verificar"
+                        :loading="useAccount.apiName === 'verifyAccount'" />
 
-                    <Button v-if="currentStep === 1" type="button" label="Atras" class="btn" @click="back()"></Button>
-                    <!-- Button Loader -->
-                    <button v-if="currentStep === 1" @click="restorePassword()"
-                        :disabled="useAccount.apiName === 'restorePassword'" class="btn btn-primary" type="submit">
-                        <LoadingGlobal v-if="useAccount.apiName === 'restorePassword'" />
-                        <span v-else>Restaurar</span>
-                    </button>
+                    <ButtonGlobal v-if="currentStep === 1" type="button" label="Atras" class="btn" @click="back()" />
+                    <ButtonGlobal v-if="currentStep === 1" @click="restorePassword()" class="btn btn-primary"
+                        type="submit" :disabled="useAccount.apiName === 'restorePassword'" label="Restaurar contraseña"
+                        :loading="useAccount.apiName === 'restorePassword'" />
 
-
-                    <Button v-if="currentStep === 2" type="button" label="Atras" class="btn" @click="back()"></Button>
-                    <Button v-if="currentStep === 2" type="button" label="Iniciar sesión" @click="ready()"
-                        class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-simple"></Button>
+                    <ButtonGlobal v-if="currentStep === 2" type="button" label="Atras" class="btn" @click="back()" />
+                    <ButtonGlobal v-if="currentStep === 2" type="button" label="Iniciar sesión" @click="ready()"
+                        class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-simple" />
 
                 </div>
             </Form>
