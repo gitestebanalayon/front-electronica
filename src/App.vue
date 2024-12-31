@@ -1,5 +1,5 @@
 <script setup>
-import { watch } from 'vue';
+import { watch, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 import NavBar from './components/page/navbar/Component.vue';
@@ -12,6 +12,16 @@ const accountStore = useAccountStore();
 
 const theme = localStorage.getItem("tablerTheme");
 const router = useRouter();
+
+// const loadingPage = ref(true)
+
+
+
+// onMounted(async () => {
+//     const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+//     await simulateDelay(2000);
+//     loadingPage.value = false;
+// })
 
 const verifyTokenIfAuthenticated = async () => {
     if (accountStore.isAuthenticated) {
@@ -30,6 +40,7 @@ watch(
         verifyTokenIfAuthenticated();
     }
 );
+
 
 
 </script>

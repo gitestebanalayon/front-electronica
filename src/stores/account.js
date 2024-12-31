@@ -10,9 +10,6 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
-
-
-
 export const useAccountStore = defineStore('account', {
     state: () => ({
         isAuthenticated: !!user.token, // Indica si el usuario está autenticado
