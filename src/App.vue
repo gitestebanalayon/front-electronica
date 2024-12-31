@@ -32,7 +32,6 @@ watch(
     }
 );
 
-
 </script>
 
 <template>
