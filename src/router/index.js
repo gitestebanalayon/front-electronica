@@ -122,14 +122,14 @@ router.beforeEach(async (to, from, next) => {
 
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
-  if (user.token && accountStore.isAuthenticated) {
-    // Verifica el token si el usuario no está autenticado
-    const isValid = await accountStore.verifyToken();
-    
-    if (!isValid) {
-      return next('/'); // Redirige al login si el token no es válido
-    }
-  }
+  // if (user.token && accountStore.isAuthenticated) {
+  //   // Verifica el token si el usuario no está autenticado
+  //   const isValid = await accountStore.verifyToken();
+
+  //   if (!isValid) {
+  //     return next('/'); // Redirige al login si el token no es válido
+  //   }
+  // }
 
   if (accountStore.isAuthenticated && to.name === 'login') {
     return next('/home'); // Evita que los usuarios autenticados accedan al login

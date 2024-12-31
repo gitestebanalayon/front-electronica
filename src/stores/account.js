@@ -16,7 +16,7 @@ const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 export const useAccountStore = defineStore('account', {
     state: () => ({
         isAuthenticated: !!user.token, // Indica si el usuario está autenticado
-        user: {}, // Almacena los datos del usuario
+        loadingPage: false,
 
         alerts: [], // Lista de alertas activas
         apiName: null, // Nombre de la API que se está llamando
@@ -62,15 +62,15 @@ export const useAccountStore = defineStore('account', {
                 this.apiName = 'login';
                 this.clearAlerts(); // Limpia cualquier alerta existente
 
-                const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+                // const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
                 const response = await axios.post(`${BASE_URL}api/v1/auth/login`, { 'email': email, 'password': password });
-                await simulateDelay(2000);
+                // await simulateDelay(2000);
 
                 if (response.data.statusCode === 200) {
 
+
                     const token = response.data.data.token;
                     const decodedToken = jwt_decode(token);
-
                     // Guardamos los datos en sessionStorage
                     const userData = {
                         token,
@@ -81,15 +81,16 @@ export const useAccountStore = defineStore('account', {
                     };
                     sessionStorage.setItem("user", JSON.stringify(userData));
 
-                    // Actualizamos el estado en Pinia
+                    const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+                    this.loadingPage = true;
                     this.isAuthenticated = true;
-                    this.user = userData;
+                    await simulateDelay(5000);
 
                     return response.data;
                 }
-
                 return false;
             } catch (error) {
+                this.loadingPage = false;
                 this.apiName = null;
                 switch (error?.response?.data?.statusCode) {
                     case 401:
@@ -111,6 +112,7 @@ export const useAccountStore = defineStore('account', {
                 }
                 return false
             } finally {
+                this.loadingPage = false;
                 this.apiName = null;
             }
         },
@@ -118,10 +120,13 @@ export const useAccountStore = defineStore('account', {
             try {
                 const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
+                // const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
                 const response = await axios.get(`${BASE_URL}api/v1/auth/account/validate-token`, {
                     headers: { Authorization: `Bearer ${user.token}` },
                 });
 
+
+                // await simulateDelay(10000);
                 if (response.data.statusCode === 200) {
                     this.isAuthenticated = true;
                     return true;
@@ -130,8 +135,13 @@ export const useAccountStore = defineStore('account', {
                 sessionStorage.clear();
                 this.isAuthenticated = false;
                 return false;
-
             } catch (error) {
+                if (error.response.data.statusCode === 401) {
+                    sessionStorage.clear();
+                    this.isAuthenticated = false;
+                    return false;
+                }
+
                 sessionStorage.clear();
                 this.isAuthenticated = false;
                 return false;
@@ -356,16 +366,20 @@ export const useAccountStore = defineStore('account', {
                 const headers = { Authorization: `Bearer ${user.token}` };
                 const response = await axios.get(`${BASE_URL}api/v1/account/filter/profile`, { headers });
 
+
                 if (response.data.statusCode === 200) {
                     this.profile = response.data.data
                 }
 
+                if (response.data.statusCode === 401) {
+                    this.isAuthenticated === false;
+                    sessionStorage.clear();
+                }
+
             } catch (error) {
                 this.apiName = null;
-
                 console.log(error.response.data);
-
-
+                sessionStorage.clear();
             } finally {
                 this.apiName = null;
             }

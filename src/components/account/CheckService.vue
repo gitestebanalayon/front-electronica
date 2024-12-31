@@ -1,6 +1,6 @@
 <template>
 
-    <main class=" d-flex flex-column vh-100">
+    <main class="d-flex flex-column vh-100">
         <div class="page page-center">
             <div class="container container-slim py-4">
                 <div class="text-center">
