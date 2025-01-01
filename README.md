@@ -1,16 +1,35 @@
-# tabler
+# 🌟 Tabler 
 
-This template should help get you started developing with Vue 3 in Vite.
+A modern Vue 3 template to kickstart your development with Vite, offering a streamlined setup and efficient tooling.
 
-## Recommended IDE Setup
+## 🚀 Features
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- Vue 3 with Composition API
+- Vite for lightning-fast builds
+- Ready-to-use development and production commands
+- Recommended IDE and tool integrations
 
-## Customize configuration
+---
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+## 🛠️ Recommended IDE Setup
 
-## Project Setup
+We recommend using:
+
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [Volar Extension](https://marketplace.visualstudio.com/items?itemName=Vue.volar)  
+  *(Remember to disable Vetur for the best experience)*  
+
+---
+
+## ⚙️ Configuration
+
+Customize the setup as needed by visiting the [Vite Configuration Reference](https://vitejs.dev/config/).
+
+---
+
+## 📦 Project Setup
+
+To get started, clone the repository and install dependencies:
 
 ```sh
 npm install
