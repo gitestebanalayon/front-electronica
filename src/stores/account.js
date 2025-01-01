@@ -1,28 +1,26 @@
 import axios from "axios";
 import { defineStore } from 'pinia';
 import jwt_decode from 'jwt-decode';
+import { ref } from "vue";
 //import Swal from "sweetalert2";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-
-
-
-const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+const user = ref(JSON.parse(sessionStorage.getItem("user") || "{}"));
 
 export const useAccountStore = defineStore('account', {
     state: () => ({
-        isAuthenticated: !!user.token, // Indica si el usuario está autenticado
+        isAuthenticated: !!user.value.token, // Indica si el usuario está autenticado
         loadingPage: false,
 
         alerts: [], // Lista de alertas activas
         apiName: null, // Nombre de la API que se está llamando
 
-        cooldownTime: 3,
+        cooldownTime: 60,
         intervalId: null,
         isButtonDisabled: false,
 
-        profile: {}
+        profile: {} // Perfil del usuario que filtra la API de la función filterProfile
     }),
     actions: {
         // Funciones para manejar las alertas
@@ -42,7 +40,7 @@ export const useAccountStore = defineStore('account', {
 
         // Función para manejar el temporizador del enviar código
         async startCooldown() {
-            this.cooldownTime = 3; // Reinicia el temporizador
+            this.cooldownTime = 60; // Reinicia el temporizador
             this.intervalId = setInterval(() => {
                 if (this.cooldownTime > 0) {
                     this.cooldownTime--;
@@ -64,8 +62,6 @@ export const useAccountStore = defineStore('account', {
                 // await simulateDelay(2000);
 
                 if (response.data.statusCode === 200) {
-
-
                     const token = response.data.data.token;
                     const decodedToken = jwt_decode(token);
                     // Guardamos los datos en sessionStorage
@@ -80,9 +76,9 @@ export const useAccountStore = defineStore('account', {
 
                     const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
                     this.loadingPage = true;
-                    this.isAuthenticated = true;
                     await simulateDelay(5000);
 
+                    this.isAuthenticated = true;
                     return response.data;
                 }
                 return false;
@@ -121,9 +117,8 @@ export const useAccountStore = defineStore('account', {
                 const response = await axios.get(`${BASE_URL}api/v1/auth/account/validate-token`, {
                     headers: { Authorization: `Bearer ${user.token}` },
                 });
-
-
                 // await simulateDelay(10000);
+
                 if (response.data.statusCode === 200) {
                     this.isAuthenticated = true;
                     return true;
@@ -354,9 +349,7 @@ export const useAccountStore = defineStore('account', {
         async filterProfile() {
             try {
                 this.apiName = 'filterProfile';
-                this.clearAlerts(); // Limpia cualquier alerta existente
-
-                // let headers = { Authorization: token ? `Bearer ${token}` : '', };
+                this.clearAlerts();
 
                 const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 

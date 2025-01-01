@@ -4,10 +4,10 @@
         <div class="page page-center">
             <div class="container-tight py-4">
                 <div class="empty">
-                    <div class="empty-header">500</div>
-                    <p class="empty-title">Vaya... Acabas de encontrar una página de error.</p>
+                    <div class="empty-header">503</div>
+                    <p class="empty-title">Servicio en Mantenimiento</p>
                     <p class="empty-subtitle text-muted">
-                        Lo sentimos el servicio no esta disponible en este momento.
+                        Nuestro sitio está en mantenimiento temporal. Intente nuevamente más tarde.
                     </p>
                     <div class="empty-action">
                         <a href="./." class="btn btn-primary">

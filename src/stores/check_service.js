@@ -11,10 +11,7 @@ export const useCheckServiceStore = defineStore('check_service', {
     actions: {
         async check_service() {
             try {
-
                 const response = await axios.get(`${BASE_URL}api/v1/service`);
-
-
                 if (response.status === 200) {
                     return true;
                 } else {
