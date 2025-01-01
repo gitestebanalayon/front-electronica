@@ -29,8 +29,6 @@ Customize the setup as needed by visiting the [Vite Configuration Reference](htt
 
 ## 📦 Project Setup
 
-To get started, clone the repository and install dependencies:
-
 ```sh
 npm install
 ```
