@@ -14,9 +14,9 @@ const scopedAlerts = computed(() => {
     return alertStore.alerts.filter(alert => alert.scope === props.scope);
 });
 
-function removeAlert(index) {
-    alertStore.removeAlert(index);
-}
+// function removeAlert(index) {
+//     alertStore.removeAlert(index);
+// }
 </script>
 
 <template>

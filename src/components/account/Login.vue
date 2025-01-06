@@ -50,7 +50,6 @@
                             ¿Cuenta bloqueada? <a href="#" tabindex="-1" data-bs-toggle="modal"
                                 data-bs-target="#modal-unlock">desbloquear cuenta.</a>
                         </div>
-
                     </Form>
                 </div>
             </div>

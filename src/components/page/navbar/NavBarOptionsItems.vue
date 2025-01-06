@@ -6,7 +6,8 @@ defineProps(['name', 'icon', 'routs', 'badge'])
 <template>
     <li>
         <RouterLink class="nav-link text-secondary position-relative" :to="routs">
-            <i :class="icon" class="me-2"></i>
+            <!-- <i :class="icon" class="me-2"></i> -->
+            <font-awesome-icon :icon="icon" class="ico icon-style me-2" />
             <span class="nav-link-title"> {{ name }} </span>
             <span v-if="badge == 'active'" class="new bg-green text-white">NEW</span>
         </RouterLink>
@@ -14,6 +15,11 @@ defineProps(['name', 'icon', 'routs', 'badge'])
 </template>
 
 <style scoped>
+.ico {
+    width: 1.0625em;
+    text-align: center;
+}
+
 .new {
     font-size: 12px;
     font-weight: 600;

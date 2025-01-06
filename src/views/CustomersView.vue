@@ -7,7 +7,7 @@ import HeaderPage from '@/components/page/header/Component.vue';
 <template>
     <main class="page-wrapper">
         <!-- Page header -->
-        <HeaderPage icon="ti ti-crown" text="Clientes" />
+        <HeaderPage :icon="['fas', 'crown']" text="Clientes" />
 
         <div class="page-body mt-3 mb-3">
             <div class="ps-3 pe-3">

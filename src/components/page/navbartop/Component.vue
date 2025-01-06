@@ -31,7 +31,7 @@ const user = JSON.parse(sessionStorage.getItem("user") || "{}");
                 <ThemeMode />
 
                 <!-- <DropDown icon="ti ti-comment" title="Mensajes" avatar_active="d-block" /> -->
-                <DropDown icon="ti ti-bell" title="Notificaciónes" />
+                <DropDown :icon="['fas', 'bell']" title="Notificaciónes" />
 
                 <div class="navbar-nav flex-row">
                     <div class="nav-item dropdown">
@@ -61,5 +61,11 @@ const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 <style scoped>
 .sidebar {
     margin-left: 15rem;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 10px !important;
+    right: -3px !important;
 }
 </style>

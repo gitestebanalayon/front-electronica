@@ -9,10 +9,8 @@ import svg from '../assets/svg/icons-svg.json';
 <template>
 
     <main class="page-wrapper">
-
-
         <!-- Page header -->
-        <HeaderPage icon="ti ti-home" text="Inicio" />
+        <HeaderPage :icon="['fas', 'home']" text="Inicio" />
 
         <!-- Page body -->
         <div class="page-body mt-3 mb-3">

@@ -5,12 +5,79 @@
     border: none !important;
 }
 
+/*BORDERS NORMAL*/
+.border-sub {
+    border-top: 1px solid #f6f8fb !important;
+}
+
+[data-bs-theme="dark"] .border-sub {
+    border-top: 1px solid #151f2c !important;
+}
+
+.border-right {
+    border-right: 1px solid #f6f8fb !important;
+}
+
+[data-bs-theme="dark"] .border-right {
+    border-right: 1px solid #151f2c !important;
+}
+
+.border-down {
+    border-bottom: 1px solid #f6f8fb !important;
+}
+
+[data-bs-theme="dark"] .border-down {
+    border-bottom: 1px solid #151f2c !important;
+}
+
+.border-left {
+    border-left: 1px solid #f6f8fb !important;
+}
+
+[data-bs-theme="dark"] .border-left {
+    border-left: 1px solid #151f2c !important;
+}
+
+/*BORDERS BOLD*/
+.border-bold-sub {
+    border-top: 2px solid #f6f8fb !important;
+}
+
+[data-bs-theme="dark"] .border-bold-sub {
+    border-top: 2px solid #151f2c !important;
+}
+
+.border-bold-right {
+    border-right: 2px solid #f6f8fb !important;
+}
+
+[data-bs-theme="dark"] .border-bold-right {
+    border-right: 2px solid #151f2c !important;
+}
+
+.border-bold-down {
+    border-bottom: 2px solid #f6f8fb !important;
+}
+
+[data-bs-theme="dark"] .border-bold-down {
+    border-bottom: 2px solid #151f2c !important;
+}
+
+.border-bold-left {
+    border-left: 2px solid #f6f8fb !important;
+}
+
+[data-bs-theme="dark"] .border-bold-left {
+    border-left: 2px solid #151f2c !important;
+}
+
+
 input {
     outline: none;
 }
 
-i {
-    font-size: 16px;
+.icon-style {
+    font-size: 1.2em;
 }
 
 .alert {
@@ -376,4 +443,9 @@ body #restore-password .step-progress__step--valid::after {
 
 .btn-primary {
     background: #1877f2 !important;
+}
+
+.btn-ghost-primary:hover{
+    background: #1877f2 !important;
+    border: 1px solid #1877f2 !important; 
 }
