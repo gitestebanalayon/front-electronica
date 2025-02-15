@@ -2,7 +2,7 @@ import axios from "axios";
 import { defineStore } from 'pinia';
 import jwt_decode from 'jwt-decode';
 import { ref } from "vue";
-//import Swal from "sweetalert2";
+import Swal from "sweetalert2";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -128,8 +128,8 @@ export const useAccountStore = defineStore('account', {
                 this.isAuthenticated = false;
                 return false;
             } catch (error) {
-               
-                
+
+
                 if (error?.response?.data?.statusCode === 401) {
                     sessionStorage.clear();
                     this.isAuthenticated = false;
@@ -266,8 +266,8 @@ export const useAccountStore = defineStore('account', {
             } catch (error) {
                 this.apiName = null;
 
-                console.log(error.response?.data?.statusCode);
-                console.log(error.response?.data?.message);
+                // console.log(error.response?.data?.statusCode);
+                // console.log(error.response?.data?.message);
 
 
                 switch (error.response?.data?.statusCode) {
@@ -378,10 +378,92 @@ export const useAccountStore = defineStore('account', {
                 this.apiName = null;
             }
         },
-        async updateProfile() {
-            
-        }
+        async updateProfile(profile) {
+            try {
+                this.apiName = 'updateProfile';
+                this.clearAlerts(); // Limpia cualquier alerta existente
 
+                const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+
+                const headers = { Authorization: `Bearer ${user.token}` };
+
+                const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+                const response = await axios.put(`${BASE_URL}api/v1/account/update/profile`,
+                    {
+                        'origen': profile.origen,
+                        'ci': profile.ci,
+                        'first_name': profile.first_name,
+                        'last_name': profile.last_name,
+                        'birthdate': profile.birthdate,
+                        'phone': profile.phone,
+                    },
+                    {
+                        headers
+                    });
+                await simulateDelay(2000);
+
+                if (response.data.statusCode === 200) {
+                    // this.addAlert({
+                    //     type: 'success',
+                    //     title: '¡Perfil actualizado exitosamente!',
+                    //     message: response?.data?.message,
+                    //     scope: 'updateProfile',
+                    // });
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'bottom-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'custom-toast'
+                        },
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    });
+                    Toast.fire({
+                        icon: 'success',
+                        title: response?.data?.message
+                    })
+                    return true;
+                }
+
+                return false;
+            } catch (error) {
+                this.apiName = null;
+
+                // console.log(error.response?.data?.statusCode);
+                // console.log(error.response?.data?.message);
+
+
+                switch (error.response?.data?.statusCode) {
+                    case 422:
+                        this.addAlert({
+                            type: 'danger',
+                            title: '¡Ups!',
+                            message: error.response?.data?.message,
+                            scope: 'updateProfile',
+                        });
+                        break;
+
+                    default:
+                        this.addAlert({
+                            type: 'danger',
+                            title: '¡Servicio no disponible!',
+                            message: 'Por favor recarga la página para verificar el servicio',
+                            scope: 'updateProfile',
+                        });
+                        break;
+                }
+
+                return false;
+            } finally {
+                this.apiName = null;
+            }
+
+        }
     },
 });
 

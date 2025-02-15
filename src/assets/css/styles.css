@@ -441,7 +441,7 @@ body #restore-password .step-progress__step--valid::after {
 
 /*BOTONES*/
 
-.btn-primaryy{
+.btn-primaryy {
     background: #4193ff !important;
 }
 
@@ -453,9 +453,9 @@ body #restore-password .step-progress__step--valid::after {
     background: #ff395a !important;
 }
 
-.btn-ghost-primary:hover{
+.btn-ghost-primary:hover {
     background: #1877f2 !important;
-    border: 1px solid #1877f2 !important; 
+    border: 1px solid #1877f2 !important;
 }
 
 .btn-outline-primary {
@@ -463,7 +463,7 @@ body #restore-password .step-progress__step--valid::after {
     color: #1877f2 !important;
 }
 
-.btn-outline-primary:hover{
+.btn-outline-primary:hover {
     background: #1877f2 !important;
     color: #fff !important;
 }
@@ -473,8 +473,15 @@ body #restore-password .step-progress__step--valid::after {
     color: #f02849 !important;
 }
 
-.btn-outline-danger:hover{
+.btn-outline-danger:hover {
     background: #f02849 !important;
     color: #fff !important;
 }
 
+
+/* SWEETALERT 2 STYLES*/
+
+[data-bs-theme="dark"] .custom-toast {
+    background: #151f2c !important;
+    color: rgb(43, 162, 63) !important;
+}
