@@ -128,7 +128,9 @@ export const useAccountStore = defineStore('account', {
                 this.isAuthenticated = false;
                 return false;
             } catch (error) {
-                if (error.response.data.statusCode === 401) {
+               
+                
+                if (error?.response?.data?.statusCode === 401) {
                     sessionStorage.clear();
                     this.isAuthenticated = false;
                     return false;
@@ -354,8 +356,9 @@ export const useAccountStore = defineStore('account', {
                 const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
                 const headers = { Authorization: `Bearer ${user.token}` };
+                // const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
                 const response = await axios.get(`${BASE_URL}api/v1/account/filter/profile`, { headers });
-
+                // await simulateDelay(5000);
 
                 if (response.data.statusCode === 200) {
                     this.profile = response.data.data
@@ -369,10 +372,14 @@ export const useAccountStore = defineStore('account', {
             } catch (error) {
                 this.apiName = null;
                 console.log(error.response.data);
+                this.isAuthenticated === false;
                 sessionStorage.clear();
             } finally {
                 this.apiName = null;
             }
+        },
+        async updateProfile() {
+            
         }
 
     },

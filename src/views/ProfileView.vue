@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
 
@@ -12,6 +12,7 @@ import LabelGlobal from "@/components/global/LabelGlobal.vue";
 
 import avatar from '@/assets/img/esteban.jpg';
 import { useAccountStore } from '@/stores/account';
+import LabelGlobalPlaceholder from '@/components/global/LabelGlobalPlaceholder.vue';
 
 const useAccount = useAccountStore();
 onMounted(async () => {
@@ -54,7 +55,29 @@ const schema = ref(yup.object().shape({
 })
 );
 
-function updateProfile() {
+// Estado reactivo inicializado vacío
+const formData = ref({
+    first_name: '',
+    last_name: '',
+    origen: '',
+    ci: '',
+    birthdate: '',
+    phone: '',
+    email: ''
+});
+
+// Sincronizar formData con profile cuando cambie
+watch(() => useAccount.profile, (newProfile) => {
+    if (newProfile) {
+        formData.value = { ...newProfile }; // Clonamos el objeto para evitar referencia directa
+    }
+}, { deep: true, immediate: true });
+
+console.log(formData.value.first_name);
+
+
+
+async function updateProfile() {
 
 }
 
@@ -89,9 +112,128 @@ function updateProfile() {
                         <div class="col d-flex flex-column">
                             <div class="tab-content">
 
-                                <div id="tabs-profile" class="tab-pane active show" role="tabpanel">
+                                <div v-if="useAccount.apiName === 'filterProfile'" id="tabs-profile"
+                                    class="tab-pane active show placeholder-glow" role="tabpanel">
                                     <div class="card-header border-0 pb-0">
-                                        <TitleGlobal type="h2" text="Perfil" />
+                                        <div class="placeholder" style="height: 20px; width: 50px;"></div>
+                                        <!-- <TitleGlobal style="height: 20px;" type="h2" text="Perfil" /> -->
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <span class="avatar avatar-xl">
+                                                    <div class="avatar avatar-xl placeholder"></div>
+                                                </span>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="btn btn-primaryy placeholder"
+                                                    style="height: 40px; width: 126px;"></div>
+                                                <!-- <ButtonGlobal class="btn btn-outline-primary" type="button"
+                                                    label="Cambiar avatar" /> -->
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="btn btn-dangerr placeholder"
+                                                    style="height: 40px; width: 126px;"></div>
+                                                <!-- <ButtonGlobal class="btn btn-outline-danger" type="button"
+                                                    label="Eliminar avatar" /> -->
+                                            </div>
+                                        </div>
+
+                                        <Form id="update-profile" class="g-3 mt-3">
+
+                                            <div class="row">
+                                                <div class="col-md mb-3">
+                                                    <LabelGlobalPlaceholder
+                                                        style="height: 16px; width: 59px; margin-bottom: 12px;" />
+                                                    <div class="placeholder" style="height: 39.6px; width: 100%;"></div>
+
+                                                </div>
+                                                <div class="col-md mb-3">
+                                                    <LabelGlobalPlaceholder
+                                                        style="height: 16px; width: 59px; margin-bottom: 12px;" />
+                                                    <div class="placeholder" style="height: 39.6px; width: 100%;"></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md mb-3">
+                                                    <LabelGlobalPlaceholder
+                                                        style="height: 16px; width: 51px; margin-bottom: 12px;" />
+                                                    <div class="placeholder" style="height: 39.6px; width: 100%;"></div>
+                                                    <!-- <Field v-model="useAccount.profile.origen" class="form-control"
+                                                        :class="{ 'is-invalid': errors.origen }" type="text"
+                                                        name="origen" />
+                                                    <ErrorMessage name="origen" class="invalid-feedback" /> -->
+                                                </div>
+                                                <div class="col-md mb-3">
+                                                    <LabelGlobalPlaceholder
+                                                        style="height: 16px; width: 51px; margin-bottom: 12px;" />
+
+                                                    <div class="placeholder" style="height: 39.6px; width: 100%;"></div>
+                                                    <!-- <Field v-model="useAccount.profile.ci" class="form-control"
+                                                        :class="{ 'is-invalid': errors.ci }" type="number" name="ci" />
+                                                    <ErrorMessage name="ci" class="invalid-feedback" /> -->
+                                                </div>
+                                                <div class="col-md mb-3">
+                                                    <LabelGlobalPlaceholder
+                                                        style="height: 16px; width: 144px; margin-bottom: 12px;" />
+
+                                                    <div class="placeholder" style="height: 39.6px; width: 100%;"></div>
+                                                    <!-- <Field v-model="useAccount.profile.birthdate" class="form-control"
+                                                        :class="{ 'is-invalid': errors.birthdate }" type="date"
+                                                        name="birthdate" />
+                                                    <ErrorMessage name="birthdate" class="invalid-feedback" /> -->
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md mb-3">
+                                                    <LabelGlobalPlaceholder
+                                                        style="height: 16px; width: 63px; margin-bottom: 12px;" />
+
+                                                    <div class="placeholder" style="height: 39.6px; width: 100%;"></div>
+                                                    <!-- <Field v-model="useAccount.profile.phone" class="form-control"
+                                                        :class="{ 'is-invalid': errors.phone }" type="text"
+                                                        name="phone" />
+                                                    <ErrorMessage name="phone" class="invalid-feedback" /> -->
+                                                </div>
+                                                <div class="col-md mb-3">
+                                                    <LabelGlobalPlaceholder
+                                                        style="height: 16px; width: 51px; margin-bottom: 12px;" />
+
+                                                    <div class="placeholder" style="height: 39.6px; width: 100%;"></div>
+                                                    <!-- <Field v-model="useAccount.profile.email" class="form-control"
+                                                        :class="{ 'is-invalid': errors.email }" type="email"
+                                                        name="email" />
+                                                    <ErrorMessage name="email" class="invalid-feedback" /> -->
+                                                </div>
+                                                <div class="col-md mb-3">
+                                                    <LabelGlobalPlaceholder
+                                                        style="height: 16px; width: 115px; margin-bottom: 12px;" />
+
+                                                    <div class="placeholder" style="height: 39.6px; width: 100%;"></div>
+                                                    <!-- <ButtonGlobal class="btn w-100" type="button"
+                                                        label="Establecer una nueva" /> -->
+                                                </div>
+                                            </div>
+                                        </Form>
+                                    </div>
+                                    <div class="card-footer border-0 pt-0 bg-transparent mt-auto">
+                                        <div class="btn-list justify-content-center">
+                                            <div class="col col-md-2">
+                                                <div class="btn btn-primaryy placeholder"
+                                                    style="height: 40px; width: 100%;"></div>
+
+                                                <!-- <ButtonGlobal class="btn btn-primary w-100" type="button"
+                                                    label="Entregar" /> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-else id="tabs-profile" class="tab-pane active show" role="tabpanel">
+                                    <div class="card-header border-0 pb-0">
+                                        <TitleGlobal type="h2" style="height: 20px;" text="Perfil" />
                                     </div>
                                     <div class="card-body">
                                         <div class="row align-items-center">
@@ -100,21 +242,21 @@ function updateProfile() {
                                                     :style="{ backgroundImage: `url(${avatar})` }"></span>
                                             </div>
                                             <div class="col-auto">
-                                                <ButtonGlobal class="btn btn-ghost-primary" type="button"
+                                                <ButtonGlobal class="btn btn-outline-primary" type="button"
                                                     label="Cambiar avatar" />
                                             </div>
                                             <div class="col-auto">
-                                                <ButtonGlobal class="btn btn-ghost-danger" type="button"
+                                                <ButtonGlobal class="btn btn-outline-danger" type="button"
                                                     label="Eliminar avatar" />
                                             </div>
                                         </div>
 
-                                        <Form id="update-profile" class="g-3 mt-3" @submit=""
+                                        <Form id="update-profile" class="g-3 mt-3" @submit="updateProfile"
                                             :validation-schema="schema" v-slot="{ errors }">
 
                                             <div class="row">
                                                 <div class="col-md mb-3">
-                                                    <LabelGlobal label="Nombre" />
+                                                    <LabelGlobal label="Nombre" style="height: 20px;" />
                                                     <Field v-model="useAccount.profile.first_name" class="form-control"
                                                         :class="{ 'is-invalid': errors.first_name }" type="text"
                                                         name="first_name" />
@@ -179,9 +321,12 @@ function updateProfile() {
                                         </Form>
                                     </div>
                                     <div class="card-footer border-0 pt-0 bg-transparent mt-auto">
-                                        <div class="btn-list justify-content-end">
-                                            <ButtonGlobal class="btn btn-primary" type="button" label="Entregar"
-                                                @click="updateProfile()" />
+                                        <div class="btn-list justify-content-center">
+                                            <div class="col col-md-2">
+                                                <ButtonGlobal class="btn btn-primary" style="width: 100%;" type="button"
+                                                    label="Entregar" />
+
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

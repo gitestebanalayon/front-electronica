@@ -12,7 +12,6 @@ const accountStore = useAccountStore();
 const theme = localStorage.getItem("tablerTheme");
 const router = useRouter();
 
-
 const verifyTokenIfAuthenticated = async () => {
     if (accountStore.isAuthenticated) {
         const validToken = await accountStore.verifyToken();
@@ -29,8 +28,6 @@ watch(
         verifyTokenIfAuthenticated();
     }
 );
-
-
 
 </script>
 

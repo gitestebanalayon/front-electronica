@@ -441,11 +441,40 @@ body #restore-password .step-progress__step--valid::after {
 
 /*BOTONES*/
 
+.btn-primaryy{
+    background: #4193ff !important;
+}
+
 .btn-primary {
     background: #1877f2 !important;
+}
+
+.btn-dangerr {
+    background: #ff395a !important;
 }
 
 .btn-ghost-primary:hover{
     background: #1877f2 !important;
     border: 1px solid #1877f2 !important; 
 }
+
+.btn-outline-primary {
+    border: 1px solid #1877f2 !important;
+    color: #1877f2 !important;
+}
+
+.btn-outline-primary:hover{
+    background: #1877f2 !important;
+    color: #fff !important;
+}
+
+.btn-outline-danger {
+    border: 1px solid #f02849 !important;
+    color: #f02849 !important;
+}
+
+.btn-outline-danger:hover{
+    background: #f02849 !important;
+    color: #fff !important;
+}
+
