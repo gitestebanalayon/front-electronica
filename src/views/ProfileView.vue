@@ -9,6 +9,8 @@ import TitleGlobal from '@/components/global/TitleGlobal.vue';
 import NavItemGlobal from '@/components/global/NavItemGlobal.vue';
 import ButtonGlobal from '@/components/global/ButtonGlobal.vue';
 import LabelGlobal from "@/components/global/LabelGlobal.vue";
+import LoadingGlobal from '@/components/global/LoadingGlobal.vue'
+import AlertGlobal from '@/components/global/AlertGlobal.vue'
 
 import avatar from '@/assets/img/esteban.jpg';
 import { useAccountStore } from '@/stores/account';
@@ -47,38 +49,11 @@ const schema = ref(yup.object().shape({
         .string()
         .required('El teléfono es obligatorio')
         .length(11, 'El teléfono debe tener exactamente 11 dígitos'),
-    email: yup
-        .string()
-        .email('Debe ser un correo válido')
-        .required('El correo es obligatorio'),
-
 })
 );
 
-// Estado reactivo inicializado vacío
-const formData = ref({
-    first_name: '',
-    last_name: '',
-    origen: '',
-    ci: '',
-    birthdate: '',
-    phone: '',
-    email: ''
-});
-
-// Sincronizar formData con profile cuando cambie
-watch(() => useAccount.profile, (newProfile) => {
-    if (newProfile) {
-        formData.value = { ...newProfile }; // Clonamos el objeto para evitar referencia directa
-    }
-}, { deep: true, immediate: true });
-
-console.log(formData.value.first_name);
-
-
-
 async function updateProfile() {
-
+    await useAccount.updateProfile(useAccount.profile);
 }
 
 </script>
@@ -99,7 +74,7 @@ async function updateProfile() {
                                     <TitleGlobal class="subheader ms-3 mb-3" type="h4" text="Configuración general" />
                                     <NavItemGlobal href="#tabs-profile" text="Perfil" :active="true"
                                         :ariaSelected="true" />
-                                    <NavItemGlobal href="#tabs-notification" text="Notificaciones" :active="false"
+                                    <NavItemGlobal href="#tabs-cuenta" text="Cuenta" :active="false"
                                         :ariaSelected="false" />
 
                                     <TitleGlobal class="subheader mt-3 mb-3 ms-3" type="h4" text="Experiencia" />
@@ -269,6 +244,14 @@ async function updateProfile() {
                                                         name="last_name" />
                                                     <ErrorMessage name="last_name" class="invalid-feedback" />
                                                 </div>
+
+                                                <div class="col-md mb-3">
+                                                    <LabelGlobal label="Fecha de nacimiento" />
+                                                    <Field v-model="useAccount.profile.birthdate" class="form-control"
+                                                        :class="{ 'is-invalid': errors.birthdate }" type="date"
+                                                        name="birthdate" />
+                                                    <ErrorMessage name="birthdate" class="invalid-feedback" />
+                                                </div>
                                             </div>
 
                                             <div class="row">
@@ -286,16 +269,8 @@ async function updateProfile() {
                                                         :class="{ 'is-invalid': errors.ci }" type="number" name="ci" />
                                                     <ErrorMessage name="ci" class="invalid-feedback" />
                                                 </div>
-                                                <div class="col-md mb-3">
-                                                    <LabelGlobal label="Fecha de nacimiento" />
-                                                    <Field v-model="useAccount.profile.birthdate" class="form-control"
-                                                        :class="{ 'is-invalid': errors.birthdate }" type="date"
-                                                        name="birthdate" />
-                                                    <ErrorMessage name="birthdate" class="invalid-feedback" />
-                                                </div>
-                                            </div>
 
-                                            <div class="row">
+
                                                 <div class="col-md mb-3">
                                                     <LabelGlobal label="Teléfono" />
                                                     <Field v-model="useAccount.profile.phone" class="form-control"
@@ -303,7 +278,11 @@ async function updateProfile() {
                                                         name="phone" />
                                                     <ErrorMessage name="phone" class="invalid-feedback" />
                                                 </div>
+                                                <!-- 
+                                            </div>
 
+                                            <div class="row">
+                                                
                                                 <div class="col-md mb-3">
                                                     <LabelGlobal label="Correo" />
                                                     <Field v-model="useAccount.profile.email" class="form-control"
@@ -316,27 +295,79 @@ async function updateProfile() {
                                                     <div class="form-label">Cambio de clave:</div>
                                                     <ButtonGlobal class="btn w-100" type="button"
                                                         label="Establecer una nueva" />
+                                                </div> -->
+                                            </div>
+
+                                            <div class="card-footer border-0 pt-0 bg-transparent mt-auto">
+                                                <div class="btn-list justify-content-center">
+                                                    <div class="col col-md-2">
+
+                                                        <button type="submit" class="btn btn-primary"
+                                                            :disabled="useAccount.apiName === 'updateProfile'"
+                                                            style="width: 100%;">
+                                                            <LoadingGlobal
+                                                                v-if="useAccount.apiName === 'updateProfile'" />
+                                                            <span v-else>Entregar</span>
+                                                        </button>
+
+                                                        <AlertGlobal scope="updateProfile" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </Form>
                                     </div>
-                                    <div class="card-footer border-0 pt-0 bg-transparent mt-auto">
-                                        <div class="btn-list justify-content-center">
-                                            <div class="col col-md-2">
-                                                <ButtonGlobal class="btn btn-primary" style="width: 100%;" type="button"
-                                                    label="Entregar" />
 
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
-                                <div id="tabs-notification" class="tab-pane" role="tabpanel">
+                                <div id="tabs-cuenta" class="tab-pane" role="tabpanel">
                                     <div class="card-header border-0 pb-0">
-                                        <TitleGlobal type="h2" text="Notificaciones" />
+                                        <TitleGlobal type="h2" text="Cuenta" />
                                     </div>
                                     <div class="card-body">
-                                        <p class="text-secondary">En construcción...</p>
+                                        <Form id="update-profile" class="g-3 mt-3" @submit="updateProfile"
+                                            :validation-schema="schema" v-slot="{ errors }">
+
+                                            <div class="row">
+                                                <div class="col-md mb-3">
+                                                    <LabelGlobal label="Correo" style="height: 20px;" />
+                                                    <Field v-model="useAccount.profile.email" class="form-control"
+                                                        :class="{ 'is-invalid': errors.email }" type="email"
+                                                        name="email" />
+                                                    <ErrorMessage name="email" class="invalid-feedback" />
+                                                </div>
+                                                <div class="col-md mb-3">
+                                                    <LabelGlobal label="Nombre de usuario" style="height: 20px;" />
+                                                    <Field v-model="useAccount.profile.username" class="form-control"
+                                                        :class="{ 'is-invalid': errors.email }" type="text"
+                                                        name="username" />
+                                                    <ErrorMessage name="username" class="invalid-feedback" />
+                                                </div>
+                                                <div class="col-md mb-3">
+                                                    <LabelGlobal label="Contraseña" style="height: 20px;" />
+                                                    <ButtonGlobal label="Establecer una nueva" type="button"
+                                                        class="btn w-100" />
+                                                </div>
+                                            </div>
+
+
+
+                                            <div class="card-footer border-0 pt-0 bg-transparent mt-auto">
+                                                <div class="btn-list justify-content-center">
+                                                    <div class="col col-md-2">
+
+                                                        <button type="submit" class="btn btn-primary"
+                                                            :disabled="useAccount.apiName === 'updateProfile'"
+                                                            style="width: 100%;">
+                                                            <LoadingGlobal
+                                                                v-if="useAccount.apiName === 'updateProfile'" />
+                                                            <span v-else>Entregar</span>
+                                                        </button>
+
+                                                        <AlertGlobal scope="updateProfile" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Form>
                                     </div>
                                 </div>
 
