@@ -133,8 +133,8 @@ async function updateProfile() {
                                     <div class="card-body pb-0">
                                         <div class="row align-items-center">
                                             <div class="col-auto">
-                                                <span class="avatar avatar-xl">
-                                                    <div class="avatar avatar-xl placeholder"></div>
+                                                <span class="avatar avatar-xl shadow-none">
+                                                    <div class="avatar avatar-xl placeholder shadow-none"></div>
                                                 </span>
                                             </div>
                                             <div class="col-auto">
