@@ -358,7 +358,7 @@ export const useAccountStore = defineStore('account', {
                 const headers = { Authorization: `Bearer ${user.token}` };
                 const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
                 const response = await axios.get(`${BASE_URL}api/v1/account/filter/profile`, { headers });
-                await simulateDelay(3000);
+                await simulateDelay(10000);
 
                 if (response.data.statusCode === 200) {
                     this.profile = response.data.data
