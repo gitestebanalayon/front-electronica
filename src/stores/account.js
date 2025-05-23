@@ -371,7 +371,57 @@ export const useAccountStore = defineStore('account', {
 
             } catch (error) {
                 this.apiName = null;
-                console.log(error.response.data);
+                console.log(error?.response?.data);
+
+
+                switch (error?.response?.data?.statusCode) {
+                    case 401:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Tu sesión ha expirado",
+                            confirmButtonText: "Volver a iniciar sesión",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Redirigir a la página de login
+                                window.location.reload(); // Recarga la página actual
+                            }
+                        });
+                        break;
+                    default:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Servicio no disponible",
+                            confirmButtonText: "Verificar servicio",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Redirigir a la página de login
+                                window.location.reload(); // Recarga la página actual
+                            }
+                        });
+
+                        break;
+                }
+
                 this.isAuthenticated === false;
                 sessionStorage.clear();
             } finally {
@@ -439,21 +489,68 @@ export const useAccountStore = defineStore('account', {
 
 
                 switch (error.response?.data?.statusCode) {
-                    case 422:
-                        this.addAlert({
-                            type: 'danger',
-                            title: '¡Ups!',
-                            message: error.response?.data?.message,
-                            scope: 'updateProfile',
+                    case 401:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Tu sesión ha expirado",
+                            confirmButtonText: "Volver a iniciar sesión",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Redirigir a la página de login
+                                window.location.reload(); // Recarga la página actual
+                            }
                         });
+                        break;
+                    case 422:
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'bottom-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        });
+                        Toast.fire({
+                            icon: 'error',
+                            title: error?.response?.data?.message
+                        })
                         break;
 
                     default:
-                        this.addAlert({
-                            type: 'danger',
-                            title: '¡Servicio no disponible!',
-                            message: 'Por favor recarga la página para verificar el servicio',
-                            scope: 'updateProfile',
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Servicio no disponible",
+                            confirmButtonText: "Verificar servicio",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload(); // Recarga la página actual
+                            }
                         });
                         break;
                 }
@@ -463,7 +560,118 @@ export const useAccountStore = defineStore('account', {
                 this.apiName = null;
             }
 
+        },
+
+        async newPassword(currentPassword, password) {
+            try {
+                this.apiName = 'newPassword';
+                this.clearAlerts(); // Limpia cualquier alerta existente
+
+
+                const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+                const headers = { Authorization: `Bearer ${user.token}` };
+
+
+
+                // Realizar la solicitud PUT con axios
+                const response = await axios.put(`${BASE_URL}api/v1/account/update/password`,
+                    {
+                        'currentPassword': currentPassword,
+                        'password': password,
+                    },
+                    {
+                        headers
+                    });
+
+
+
+                if (response.data.statusCode === 200) {
+                    this.addAlert({
+                        type: 'success',
+                        title: '¡Contraseña actualizada!',
+                        message: response?.data?.message,
+                        scope: 'newPassword',
+                    });
+                    return true;
+                }
+
+                return false;
+            } catch (error) {
+                this.apiName = null;
+
+                switch (error.response?.data?.statusCode) {
+                    case 401:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Tu sesión ha expirado",
+                            confirmButtonText: "Volver a iniciar sesión",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Redirigir a la página de login
+                                window.location.reload(); // Recarga la página actual
+                            }
+                        });
+                        break;
+                    case 409:
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'bottom-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        });
+                        Toast.fire({
+                            icon: 'error',
+                            title: error?.response?.data?.message
+                        })
+                        break;
+
+                    default:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Servicio no disponible",
+                            confirmButtonText: "Verificar servicio",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload(); // Recarga la página actual
+                            }
+                        });
+                        break;
+                }
+
+                // return false;
+            } finally {
+                this.apiName = null;
+            }
         }
+
     },
 });
 

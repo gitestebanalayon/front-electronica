@@ -22,12 +22,12 @@ const verifyTokenIfAuthenticated = async () => {
 };
 
 // Observa los cambios en la ruta activa
-watch(
-    () => router.currentRoute.value.path, // Observa el `path` de la ruta actual
-    () => {
-        verifyTokenIfAuthenticated();
-    }
-);
+// watch(
+//     () => router.currentRoute.value.path, // Observa el `path` de la ruta actual
+//     () => {
+//         verifyTokenIfAuthenticated();
+//     }
+// );
 
 </script>
 

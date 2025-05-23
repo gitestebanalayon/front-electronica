@@ -17,6 +17,9 @@ import AlertGlobal from '@/components/global/AlertGlobal.vue'
 import LabelPlaceholder from '@/components/placeholders/LabelPlaceholder.vue';
 import InputPlaceholder from '@/components/placeholders/InputPlaceholder.vue';
 
+/* COMPONENTS MODALS */
+import NewPassword from '@/components/modals/forms/NewPassword.vue';
+
 import avatar from '@/assets/img/esteban.jpg';
 import { useAccountStore } from '@/stores/account';
 
@@ -365,7 +368,8 @@ async function updateProfile() {
                                                 <div class="col-md mb-3">
                                                     <LabelGlobal label="Contraseña" style="height: 20px;" />
                                                     <ButtonGlobal label="Establecer una nueva" type="button"
-                                                        class="btn w-100" />
+                                                        class="btn w-100" data-bs-toggle="modal"
+                                                        data-bs-target="#modal-simple" />
                                                 </div>
                                             </div>
 
@@ -407,4 +411,6 @@ async function updateProfile() {
         <FooterPage />
     </main>
 
+
+    <NewPassword />
 </template>

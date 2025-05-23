@@ -485,3 +485,8 @@ body #restore-password .step-progress__step--valid::after {
     background: #151f2c !important;
     color: rgb(43, 162, 63) !important;
 }
+
+[data-bs-theme="dark"] .custom-toast-error {
+    background: #151f2c !important;
+    color: #ff6666 !important;
+}
