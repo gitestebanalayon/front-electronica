@@ -2,6 +2,8 @@
 import { onMounted, ref, watch } from 'vue';
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import Swal from "sweetalert2";
 
 /* COMPONENTS BASE */
 import HeaderPage from '@/components/page/header/Component.vue';
@@ -19,14 +21,149 @@ import InputPlaceholder from '@/components/placeholders/InputPlaceholder.vue';
 
 /* COMPONENTS MODALS */
 import NewPassword from '@/components/modals/forms/NewPassword.vue';
+import NewGmail from '@/components/modals/forms/NewGmail.vue';
 
 import avatar from '@/assets/img/esteban.jpg';
 import { useAccountStore } from '@/stores/account';
 
+// Obtiene el cliente de query
+const queryClient = useQueryClient();
+
+
 const useAccount = useAccountStore();
+useAccount.listGmail();
 onMounted(async () => {
     await useAccount.filterProfile();
 })
+
+const handleApiError = async (error) => {
+};
+
+const { isLoading, isError, data: listgmail, error, refetch: refetchGmails } = useQuery({
+    queryKey: ['gmails'],
+    queryFn: () => useAccount.listGmail(),
+    onError: handleApiError,
+});
+
+const activeGmail = async (id) => {
+    try {
+        await Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¿Quieres marcar este correo como principal?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#1877f2',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, activar',
+            cancelButtonText: 'Cancelar',
+            customClass: {
+                popup: 'custom-toast-alert'
+            },
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                // Mostrar loading
+                Swal.fire({
+                    title: 'Activando correo...',
+                    allowOutsideClick: false,
+                    customClass: { popup: 'custom-toast-alert' },
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                // Llamar a la API para activar
+                await useAccount.activeGmail(id);
+                // Invalidar la query y refrescar los datos
+                await queryClient.invalidateQueries(['gmails']);
+                // Cerrar loading y mostrar éxito
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'custom-toast'
+                    },
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: 'El correo ha sido marcado como principal',
+                })
+            }
+        });
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.response?.data?.message || 'No se pudo activar el correo',
+            confirmButtonColor: '#1877f2'
+        });
+    }
+};
+
+const deleteGmail = async (id) => {
+    try {
+        await Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¿Quieres eliminar este correo?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#1877f2',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            customClass: {
+                popup: 'custom-toast-alert'
+            },
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                // Mostrar loading
+                Swal.fire({
+                    title: 'Eliminando correo...',
+                    allowOutsideClick: false,
+                    customClass: { popup: 'custom-toast-alert' },
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                // Llamar a la API para activar
+                await useAccount.deleteGmail(id);
+                // Invalidar la query y refrescar los datos
+                await queryClient.invalidateQueries(['gmails']);
+                // Cerrar loading y mostrar éxito
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'custom-toast'
+                    },
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: 'El correo ha sido eliminado exitosamente',
+                })
+            }
+        });
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.response?.data?.message || 'No se pudo activar el correo',
+            confirmButtonColor: '#1877f2'
+        });
+    }
+};
 
 const schema = ref(yup.object().shape({
     first_name: yup
@@ -343,6 +480,7 @@ async function updateProfile() {
                                     </div>
                                 </div>
                                 <div v-else id="tabs-account" class="tab-pane" role="tabpanel">
+
                                     <div class="card-header border-0 pb-0">
                                         <TitleGlobal type="h2" text="Cuenta" />
                                     </div>
@@ -351,42 +489,123 @@ async function updateProfile() {
                                             :validation-schema="schema" v-slot="{ errors }">
 
                                             <div class="row">
-                                                <div class="col-md mb-3">
+                                                <!-- <div class="col-md mb-3">
                                                     <LabelGlobal label="Correo" style="height: 20px;" />
-                                                    <Field v-model="useAccount.profile.email" class="form-control"
+                                                    <Field v-model="useAccount.profile.gmail" class="form-control"
                                                         :class="{ 'is-invalid': errors.email }" type="email"
                                                         name="email" />
                                                     <ErrorMessage name="email" class="invalid-feedback" />
+                                                </div> -->
+                                                <div class="col">
+                                                    <div class="input-icon mb-3">
+                                                        <div class="input-group">
+                                                            <span class="input-icon-addon">
+                                                                <!-- Download SVG icon from http://tabler.io/icons/icon/user -->
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0">
+                                                                    </path>
+                                                                    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2">
+                                                                    </path>
+                                                                </svg>
+                                                            </span>
+                                                            <Field v-model="useAccount.profile.username"
+                                                                class="form-control bg-transparent rounded-start"
+                                                                :class="{ 'is-invalid': errors.username }" type="text"
+                                                                name="username" />
+                                                            <button class="btn btn-6 btn-primary"
+                                                                type="button">Ok</button>
+                                                        </div>
+                                                        <ErrorMessage name="username" class="invalid-feedback" />
+                                                    </div>
                                                 </div>
-                                                <div class="col-md mb-3">
-                                                    <LabelGlobal label="Nombre de usuario" style="height: 20px;" />
-                                                    <Field v-model="useAccount.profile.username" class="form-control"
-                                                        :class="{ 'is-invalid': errors.email }" type="text"
-                                                        name="username" />
-                                                    <ErrorMessage name="username" class="invalid-feedback" />
-                                                </div>
-                                                <div class="col-md mb-3">
-                                                    <LabelGlobal label="Contraseña" style="height: 20px;" />
-                                                    <ButtonGlobal label="Establecer una nueva" type="button"
-                                                        class="btn w-100" data-bs-toggle="modal"
-                                                        data-bs-target="#modal-simple" />
+
+                                                <div class="col">
+                                                    <div class="input-icon">
+                                                        <ButtonGlobal label="Cambiar contraseña" type="button"
+                                                            class="btn btn-6 btn-outline-primary w-100"
+                                                            data-bs-toggle="modal" data-bs-target="#modal-simple" />
+                                                    </div>
                                                 </div>
                                             </div>
-
-                                            <div class="row">
-                                                <div class="col-md-2 mb-3 m-auto">
-                                                    <button type="submit" class="btn btn-primary"
-                                                        :disabled="useAccount.apiName === 'updateProfile'"
-                                                        style="width: 100%;">
-                                                        <LoadingGlobal v-if="useAccount.apiName === 'updateProfile'" />
-                                                        <span v-else>Entregar</span>
-                                                    </button>
-
-                                                    <AlertGlobal scope="updateProfile" />
-                                                </div>
-                                            </div>
-
                                         </Form>
+
+                                        <div
+                                            class="mt-4 d-flex flex-column gap-3 align-items-center justify-content-center">
+                                            <TitleGlobal type="h2" text="Correos electrónicos" />
+                                            <ButtonGlobal label="Agregar nuevo correo" type="button"
+                                                class="btn btn-6 btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#modal-gmail" />
+
+
+
+                                        </div>
+
+
+
+                                        <div class="table-responsive mt-4 d-flex justify-content-center">
+
+                                            <div class="d-flex justify-content-center align-items-center"
+                                                v-if="isLoading" style="height: 120px;">
+                                                <div class="spinner-border" style="width: 3rem; height: 3rem;"
+                                                    role="status"></div>
+                                            </div>
+
+                                            <!-- Error state (solo si no es 503, porque 503 ya muestra Swal) -->
+                                            <div v-else-if="error" class="">
+                                                {{ error.response?.data?.message }}
+                                            </div>
+
+                                            <table v-else
+                                                class="table table-vcenter table-bordered table-nowrap card-table">
+                                                <thead class="border-thead">
+                                                    <tr>
+                                                        <th class="bg-transparent ps-2 text-start border-0">Correo</th>
+                                                        <th class="bg-transparent ps-2 text-start border-0">Principal
+                                                        </th>
+                                                        <th class="bg-transparent border-0"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="border-tbody">
+                                                    <tr v-for="gmail in listgmail" :key="gmail.id">
+                                                        <td class="bg-transparent">
+                                                            <div class="text-start">
+                                                                {{ gmail.gmail }}
+                                                            </div>
+                                                        </td>
+                                                        <td class="bg-transparent">
+                                                            <div class="text-start">
+                                                                <font-awesome-icon v-if="gmail.status === true"
+                                                                    icon="fa-solid fa-check" />
+                                                                <font-awesome-icon v-else icon="fa-solid fa-minus" />
+                                                            </div>
+                                                        </td>
+
+                                                        <td class="bg-transparent">
+                                                            <div class="text-center">
+                                                                <button class="border-0 bg-transparent me-3"
+                                                                    title="Marcar como principal"
+                                                                    :class="{ 'd-none': gmail.status === true }"
+                                                                    @click="activeGmail(gmail.id)">
+                                                                    <font-awesome-icon icon="fa-solid fa-arrow-up" />
+                                                                </button>
+                                                                <button class="border-0 bg-transparent text-danger"
+                                                                    :class="{ 'd-none': gmail.status === true }"
+                                                                    @click="deleteGmail(gmail.id)">
+                                                                    <font-awesome-icon icon="fa-solid fa-trash" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+
+                                                </tbody>
+                                            </table>
+
+                                        </div>
                                     </div>
                                 </div>
 
@@ -413,4 +632,5 @@ async function updateProfile() {
 
 
     <NewPassword />
+    <NewGmail />
 </template>

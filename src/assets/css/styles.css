@@ -481,6 +481,11 @@ body #restore-password .step-progress__step--valid::after {
 
 /* SWEETALERT 2 STYLES*/
 
+[data-bs-theme="dark"] .custom-toast-alert {
+    background: #151f2c !important;
+    color: rgb(255, 255, 255) !important;
+}
+
 [data-bs-theme="dark"] .custom-toast {
     background: #151f2c !important;
     color: rgb(43, 162, 63) !important;
@@ -490,3 +495,22 @@ body #restore-password .step-progress__step--valid::after {
     background: #151f2c !important;
     color: #ff6666 !important;
 }
+
+/* TABLES STYLES */
+[data-bs-theme="dark"] .border-thead {
+    border: 1px solid #1f2e41 !important;
+}
+
+[data-bs-theme="dark"] .border-tbody {
+    border: 1px solid #1f2e41 !important;
+}
+
+.border-thead {
+    border: 1px solid #dadfe5 !important;
+}
+
+.border-tbody {
+    border: 1px solid #dadfe5 !important;
+}
+
+

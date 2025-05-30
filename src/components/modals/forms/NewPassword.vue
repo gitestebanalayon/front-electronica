@@ -105,7 +105,6 @@ async function newPassword() {
                         label="Listo" :loading="useAccount.apiName === 'newPassword'" />
                 </div>
             </Form>
-
         </div>
     </div>
 </template>

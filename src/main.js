@@ -10,6 +10,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { VueQueryPlugin } from '@tanstack/vue-query'
 
 import 'vue-step-progress/dist/main.css';
 import 'sweetalert2/dist/sweetalert2.min.css';
@@ -24,7 +25,8 @@ const app = createApp(App)
 DataTable.use(DataTablesCore);
 app.use(router)
 app.use(pinia)
-app.use(VueSweetalert2);
+app.use(VueQueryPlugin)
+app.use(VueSweetalert2)
 app.component("font-awesome-icon", FontAwesomeIcon)
 
 app.mount('#app')

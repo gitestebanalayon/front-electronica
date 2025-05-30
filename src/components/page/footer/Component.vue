@@ -5,7 +5,7 @@
                 <div class="col-12 col-auto mt-3 mt-lg-0">
                     <ul class="list-inline list-inline-dots mb-0">
                         <li class="list-inline-item">
-                            Copyright &copy; 2024 <a href="." class="link-secondary">Electrónica.</a> Todos los derechos
+                            Copyright &copy; {{ getFullYear }} <a href="." class="link-secondary">Electrónica.</a> Todos los derechos
                             reservados.
                         </li>
                         <li class="list-inline-item">
@@ -19,3 +19,10 @@
         </div>
     </footer>
 </template>
+
+<script setup>
+
+const date = new Date();
+const getFullYear = date.getFullYear();
+
+</script>

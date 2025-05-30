@@ -20,7 +20,9 @@ export const useAccountStore = defineStore('account', {
         intervalId: null,
         isButtonDisabled: false,
 
-        profile: {} // Perfil del usuario que filtra la API de la función filterProfile
+        profile: {}, // Perfil del usuario que filtra la API de la función filterProfile
+        gmail: null,
+        listgmail: [],
     }),
     actions: {
         // Funciones para manejar las alertas
@@ -61,9 +63,12 @@ export const useAccountStore = defineStore('account', {
                 const response = await axios.post(`${BASE_URL}api/v1/auth/login`, { 'email': email, 'password': password });
                 // await simulateDelay(2000);
 
+
+
                 if (response.data.statusCode === 200) {
                     const token = response.data.data.token;
                     const decodedToken = jwt_decode(token);
+
                     // Guardamos los datos en sessionStorage
                     const userData = {
                         token,
@@ -90,6 +95,14 @@ export const useAccountStore = defineStore('account', {
                         this.addAlert({
                             type: 'danger',
                             title: '¡Credenciales inválidas!',
+                            message: error.response.data.message,
+                            scope: 'login',
+                        });
+                        break;
+                    case 409:
+                        this.addAlert({
+                            type: 'danger',
+                            title: '¡Cuenta inactiva!',
                             message: error.response.data.message,
                             scope: 'login',
                         });
@@ -356,12 +369,21 @@ export const useAccountStore = defineStore('account', {
                 const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
                 const headers = { Authorization: `Bearer ${user.token}` };
-                const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+                // const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
                 const response = await axios.get(`${BASE_URL}api/v1/account/filter/profile`, { headers });
-                await simulateDelay(3000);
+                // await simulateDelay(3000);
 
                 if (response.data.statusCode === 200) {
-                    this.profile = response.data.data
+                    this.profile = {
+                        username: response.data.data.username,
+                        origen: response.data.data.origen,
+                        ci: response.data.data.ci,
+                        first_name: response.data.data.first_name,
+                        last_name: response.data.data.last_name,
+                        birthdate: response.data.data.birthdate,
+                        phone: response.data.data.phone,
+                        gmail: response.data.data.gmail_id[0].gmail
+                    }
                 }
 
                 if (response.data.statusCode === 401) {
@@ -561,7 +583,6 @@ export const useAccountStore = defineStore('account', {
             }
 
         },
-
         async newPassword(currentPassword, password) {
             try {
                 this.apiName = 'newPassword';
@@ -595,6 +616,343 @@ export const useAccountStore = defineStore('account', {
                     return true;
                 }
 
+                return false;
+            } catch (error) {
+                this.apiName = null;
+
+                switch (error.response?.data?.statusCode) {
+                    case 401:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Tu sesión ha expirado",
+                            confirmButtonText: "Volver a iniciar sesión",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Redirigir a la página de login
+                                window.location.reload(); // Recarga la página actual
+                            }
+                        });
+                        break;
+                    case 409:
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'bottom-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        });
+                        Toast.fire({
+                            icon: 'error',
+                            title: error?.response?.data?.message
+                        })
+                        break;
+
+                    default:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Servicio no disponible",
+                            confirmButtonText: "Verificar servicio",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload(); // Recarga la página actual
+                            }
+                        });
+                        break;
+                }
+
+                // return false;
+            } finally {
+                this.apiName = null;
+            }
+        },
+        async newGmail(newGmail) {
+            try {
+                this.apiName = 'newGmail';
+                this.clearAlerts(); // Limpia cualquier alerta existente
+
+
+                const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+                const headers = { Authorization: `Bearer ${user.token}` };
+
+
+
+                // Realizar la solicitud PUT con axios
+                const response = await axios.post(`${BASE_URL}api/v1/correo/create`,
+                    {
+                        'email': newGmail
+                    },
+                    {
+                        headers
+                    }
+                );
+
+
+
+                if (response.data.statusCode === 201) {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'bottom-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'custom-toast'
+                        },
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    });
+                    Toast.fire({
+                        icon: 'success',
+                        title: response?.data?.message
+                    })
+                    return true;
+                }
+
+                return false;
+            } catch (error) {
+                this.apiName = null;
+
+                switch (error.response?.data?.statusCode) {
+                    case 401:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Tu sesión ha expirado",
+                            confirmButtonText: "Volver a iniciar sesión",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Redirigir a la página de login
+                                window.location.reload(); // Recarga la página actual
+                            }
+                        });
+                        break;
+                    case 409:
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'bottom-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        });
+                        Toast.fire({
+                            icon: 'error',
+                            title: error?.response?.data?.message
+                        })
+                        break;
+                    default:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Servicio no disponible",
+                            confirmButtonText: "Verificar servicio",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload(); // Recarga la página actual
+                            }
+                        });
+                        break;
+                }
+
+                // return false;
+            } finally {
+                this.apiName = null;
+            }
+        },
+        async listGmail() {
+            try {
+                const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+                const headers = { Authorization: `Bearer ${user.token}` };
+
+                // Simular retraso para testing (opcional)
+                // const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+                const response = await axios.get(`${BASE_URL}api/v1/correo/read`, { headers });
+                // await simulateDelay(3000); // Solo para desarrollo, quitar en producción
+
+                if (response.status !== 200) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return response.data.data;
+            } catch (error) {
+                // Re-lanzamos el error para que Vue Query lo capture
+                throw error;
+            }
+        },
+        async activeGmail(id) {
+            try {
+                this.apiName = 'activeGmail';
+                this.clearAlerts();
+
+                const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+                const headers = { Authorization: `Bearer ${user.token}` };
+
+                // Realizar la solicitud PUT con axios
+                const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+                const response = await axios.put(`${BASE_URL}api/v1/account/active/correo`,
+                    {
+                        'id': id,
+                    },
+                    {
+                        headers
+                    });
+                await simulateDelay(2000); // Solo para desarrollo, quitar en producción
+
+                if (response.data.statusCode === 200) {
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                this.apiName = null;
+
+                switch (error.response?.data?.statusCode) {
+                    case 401:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Tu sesión ha expirado",
+                            confirmButtonText: "Volver a iniciar sesión",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Redirigir a la página de login
+                                window.location.reload(); // Recarga la página actual
+                            }
+                        });
+                        break;
+                    case 409:
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'bottom-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        });
+                        Toast.fire({
+                            icon: 'error',
+                            title: error?.response?.data?.message
+                        })
+                        break;
+
+                    default:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Servicio no disponible",
+                            confirmButtonText: "Verificar servicio",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload(); // Recarga la página actual
+                            }
+                        });
+                        break;
+                }
+
+                // return false;
+            } finally {
+                this.apiName = null;
+            }
+        },
+
+        async deleteGmail(id) {
+            try {
+                this.apiName = 'deleteGmail';
+                this.clearAlerts();
+
+                const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+                const headers = { Authorization: `Bearer ${user.token}` };
+
+                // Realizar la solicitud PUT con axios
+                const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+                const response = await axios.put(`${BASE_URL}api/v1/correo/delete/${id}`,
+                    {
+                        'id': id,
+                    },
+                    {
+                        headers
+                    });
+                await simulateDelay(2000); // Solo para desarrollo, quitar en producción
+
+                if (response.data.statusCode === 200) {
+                    return true;
+                }
                 return false;
             } catch (error) {
                 this.apiName = null;
