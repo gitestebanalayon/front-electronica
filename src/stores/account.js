@@ -583,6 +583,134 @@ export const useAccountStore = defineStore('account', {
             }
 
         },
+        async updateNameUser(username) {
+            try {
+                this.apiName = 'updateNameUser';
+                this.clearAlerts(); // Limpia cualquier alerta existente
+
+                const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+
+                const headers = { Authorization: `Bearer ${user.token}` };
+
+                const simulateDelay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+                const response = await axios.put(`${BASE_URL}api/v1/account/update/username`,
+                    {
+                        'username': username,
+                    },
+                    {
+                        headers
+                    });
+                await simulateDelay(2000);
+
+                if (response.data.statusCode === 200) {
+                    // this.addAlert({
+                    //     type: 'success',
+                    //     title: '¡Perfil actualizado exitosamente!',
+                    //     message: response?.data?.message,
+                    //     scope: 'updateProfile',
+                    // });
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'bottom-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'custom-toast'
+                        },
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    });
+                    Toast.fire({
+                        icon: 'success',
+                        title: response?.data?.message
+                    })
+                    return true;
+                }
+
+                return false;
+            } catch (error) {
+                this.apiName = null;
+
+                // console.log(error.response?.data?.statusCode);
+                // console.log(error.response?.data?.message);
+
+
+                switch (error.response?.data?.statusCode) {
+                    case 401:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Tu sesión ha expirado",
+                            confirmButtonText: "Volver a iniciar sesión",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Redirigir a la página de login
+                                window.location.reload(); // Recarga la página actual
+                            }
+                        });
+                        break;
+                    case 422:
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'bottom-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        });
+                        Toast.fire({
+                            icon: 'error',
+                            title: error?.response?.data?.message
+                        })
+                        break;
+
+                    default:
+                        await Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: error?.response?.data?.message || "Servicio no disponible",
+                            confirmButtonText: "Verificar servicio",
+                            confirmButtonColor: "#1877f2",  // Aquí estableces el color del botón
+                            allowOutsideClick: false,  // Bloquea clic fuera del modal
+                            allowEscapeKey: false,      // Desactiva cerrar con ESC
+                            showCloseButton: false,     // Oculta la "X" de cerrar
+                            showCancelButton: false,    // Asegura que no haya botón alternativo
+                            focusConfirm: true,        // Enfoca automáticamente el botón
+                            customClass: {
+                                popup: 'custom-toast-error'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload(); // Recarga la página actual
+                            }
+                        });
+                        break;
+                }
+
+                return false;
+            } finally {
+                this.apiName = null;
+            }
+
+        },
         async newPassword(currentPassword, password) {
             try {
                 this.apiName = 'newPassword';
@@ -930,7 +1058,6 @@ export const useAccountStore = defineStore('account', {
                 this.apiName = null;
             }
         },
-
         async deleteGmail(id) {
             try {
                 this.apiName = 'deleteGmail';
@@ -1029,7 +1156,6 @@ export const useAccountStore = defineStore('account', {
                 this.apiName = null;
             }
         }
-
     },
 });
 

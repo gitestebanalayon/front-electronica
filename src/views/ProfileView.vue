@@ -196,8 +196,19 @@ const schema = ref(yup.object().shape({
 })
 );
 
+const schemaUsername = ref(yup.object().shape({
+    username: yup
+        .string()
+        .required('El nombre es obligatorio'),
+})
+);
+
 async function updateProfile() {
     await useAccount.updateProfile(useAccount.profile);
+}
+
+async function updateNameUser() {
+    await useAccount.updateNameUser(useAccount.profile.username);
 }
 
 </script>
@@ -485,21 +496,14 @@ async function updateProfile() {
                                         <TitleGlobal type="h2" text="Cuenta" />
                                     </div>
                                     <div class="card-body">
-                                        <Form id="update-profile" class="g-3 mt-3" @submit="updateProfile"
-                                            :validation-schema="schema" v-slot="{ errors }">
+                                        <Form id="update-username" class="g-3 mt-3" @submit="updateNameUser"
+                                            :validation-schema="schemaUsername" v-slot="{ errors }">
 
                                             <div class="row">
-                                                <!-- <div class="col-md mb-3">
-                                                    <LabelGlobal label="Correo" style="height: 20px;" />
-                                                    <Field v-model="useAccount.profile.gmail" class="form-control"
-                                                        :class="{ 'is-invalid': errors.email }" type="email"
-                                                        name="email" />
-                                                    <ErrorMessage name="email" class="invalid-feedback" />
-                                                </div> -->
                                                 <div class="col">
                                                     <div class="input-icon mb-3">
                                                         <div class="input-group">
-                                                            <span class="input-icon-addon">
+                                                            <span class="input-icon-addon" style="z-index: 9999;">
                                                                 <!-- Download SVG icon from http://tabler.io/icons/icon/user -->
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                                                     height="24" viewBox="0 0 24 24" fill="none"
@@ -513,14 +517,23 @@ async function updateProfile() {
                                                                 </svg>
                                                             </span>
                                                             <Field v-model="useAccount.profile.username"
-                                                                class="form-control bg-transparent rounded-start"
-                                                                :class="{ 'is-invalid': errors.username }" type="text"
-                                                                name="username" />
-                                                            <button class="btn btn-6 btn-primary"
-                                                                type="button">Ok</button>
+                                                            class="form-control rounded-start"
+                                                            :class="{ 'is-invalid': errors.username }" type="text"
+                                                            name="username" />
+                                                            
+
+
+
+                                                            <button type="submit" class="btn btn-6 btn-primary border-0"
+                                                                :disabled="useAccount.apiName === 'updateNameUser'"
+                                                                style="box-shadow: none;">
+                                                                <LoadingGlobal
+                                                                v-if="useAccount.apiName === 'updateNameUser'" />
+                                                                <span v-else>Ok</span>
+                                                            </button>
                                                         </div>
-                                                        <ErrorMessage name="username" class="invalid-feedback" />
                                                     </div>
+                                                    <ErrorMessage name="username" class="invalid-feedback" />
                                                 </div>
 
                                                 <div class="col">
@@ -539,9 +552,6 @@ async function updateProfile() {
                                             <ButtonGlobal label="Agregar nuevo correo" type="button"
                                                 class="btn btn-6 btn-primary" data-bs-toggle="modal"
                                                 data-bs-target="#modal-gmail" />
-
-
-
                                         </div>
 
 

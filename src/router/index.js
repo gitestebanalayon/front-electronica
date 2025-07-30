@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue'
 import CustomersView from '../views/CustomersView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import { useAccountStore } from '../stores/account'; // Asegúrate de importar el store correctamente
+import RoleView from '@/views/RoleView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -104,9 +105,9 @@ const router = createRouter({
       component: CustomersView
     },
     {
-      path: '/e',
-      name: 'e',
-      component: CustomersView
+      path: '/role',
+      name: 'role',
+      component: RoleView
     },
     {
       path: '/f',

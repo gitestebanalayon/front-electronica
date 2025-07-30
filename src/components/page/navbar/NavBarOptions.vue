@@ -38,7 +38,7 @@ import ItemsSub from './NavBarOptionsItemsSub.vue';
             <Items :icon="['fas', 'users']" name="Personas" routs="/b" badge="active" />
             <Items :icon="['fas', 'hand-point-up']" name="Puntos" routs="/c" />
             <Items :icon="['fas', 'radio']" name="Radios" routs="/d" />
-            <Items :icon="['fas', 'video']" name="Videos" routs="/e" />
+            <Items :icon="['fas', 'users-viewfinder']" name="Roles" routs="/role" />
 
             <Items :icon="['fas', 'gear']" name="Configuración" icon="ti ti-settings" routs="/profile" />
 
